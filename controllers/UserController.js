@@ -19,7 +19,7 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
     console.log(req.params);
-    await User.findById(req.params.id);
+    const user = await User.findById(req.params.id);
     res.status(200).json({
         status: true,
         user: user
@@ -35,4 +35,13 @@ const updateUser = async (req, res) => {
     });
 }
 
-module.exports = {getAllUsers, createUser, getUser, updateUser};
+const deleteUser = async (req, res) => {
+    console.log(req.body);
+    const user = await User.findOneAndDelete(req.params.id);
+    res.status(200).json({
+        status: true,
+        message: "Deleted successfully"
+    });
+}
+
+module.exports = {getAllUsers, createUser, getUser, updateUser, deleteUser};
