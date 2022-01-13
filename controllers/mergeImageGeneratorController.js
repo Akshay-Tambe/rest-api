@@ -1,7 +1,7 @@
 const Jimp = require('jimp');
 const AWS = require('aws-sdk');
 const { Validator } = require('node-input-validator');
-const config = require('./../config/config.json');
+const config = require('./../config/config.js');
 
 const generateMergeImage = async (req, res) => {
     const v = new Validator(req.body, {
