@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
+const fs = require('fs');
+var cardImageGenerator = require('./routes/cardImageGenerator');
+var mergeImageGenerator = require('./routes/mergeImageGenerator');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,6 +25,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/card-image-genrator',cardImageGenerator);
+app.use('/generate-merge-image', mergeImageGenerator);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -47,6 +52,8 @@ mongoose.connect(mongoDB, {useNewUrlParser: true});
 var db = mongoose.connection;
 
 //Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('connected', () => {
+  console.log('Connected!!')
+});
 
 module.exports = app;

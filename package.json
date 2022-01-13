@@ -12,6 +12,9 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "mongoose": "^6.1.5",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "aws-sdk": "^2.1053.0",
+    "jimp": "^0.16.1",
+    "node-input-validator": "^4.5.0"
   }
 }
