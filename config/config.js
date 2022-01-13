@@ -1,6 +1,8 @@
-{
-    "accessKeyId": "AKIA4IF2K677FSX3NPLL",
-    "secretAccessKey": "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",
+const env = require('dotenv').config();
+
+module.exports = {
+    "accessKeyId": process.env.ACCESSKEYID,
+    "secretAccessKey": process.env.SECRETACCESSKEY,
     "region": "ap-south-1",
     "bucket" : "card-aki",
     "acl" : "public-read",

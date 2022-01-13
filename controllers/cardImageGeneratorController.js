@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const jimp = require('jimp');
 const { Validator } = require('node-input-validator');
-const config = require('./../config/config.json');
+const config = require('./../config/config.js');
 
 const generateCardImage = async (req, res) => {
     const v = new Validator(req.body, {
