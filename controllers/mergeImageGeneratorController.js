@@ -1,6 +1,7 @@
 const Jimp = require('jimp');
 const AWS = require('aws-sdk');
 const { Validator } = require('node-input-validator');
+const config = require('./../config/config.json');
 
 const generateMergeImage = async (req, res) => {
     const v = new Validator(req.body, {
@@ -47,16 +48,16 @@ const generateMergeImage = async (req, res) => {
     });
 
     const s3 = new AWS.S3({
-        accessKeyId: 'AKIA4IF2K677FSX3NPLL',
-        secretAccessKey: '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',
-        region: 'ap-south-1'
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
+        region: config.region
     });
 
     const key = `${Date.now()}.png`;
 
     const params = {
-        ACL: "public-read",
-        Bucket: "card-aki",
+        ACL: config.acl,
+        Bucket: config.bucket,
         Key: key,
         Body: bufferImg,
         ContentType: 'image/png'
@@ -65,7 +66,7 @@ const generateMergeImage = async (req, res) => {
     try {
         await s3.putObject(params).promise();
         const s3url = s3.getSignedUrl('getObject', {
-            Bucket: "card-aki",
+            Bucket: config.bucket,
             Key: key
         });
         res.status(200).json({
