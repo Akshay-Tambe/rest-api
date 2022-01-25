@@ -6,11 +6,19 @@ var logger = require('morgan');
 var http = require('http');
 var cardImageGenerator = require('./routes/cardImageGenerator');
 var mergeImageGenerator = require('./routes/mergeImageGenerator');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+const mongoose = require('mongoose');
+var cors = require('cors')
+
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,14 +30,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/card-image-genrator',cardImageGenerator);
 app.use('/generate-merge-image', mergeImageGenerator);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
+});
+
+
+
+mongoose.connect(process.env.DB_Connect,{
+  useUnifiedTopology : true, useNewUrlParser :true }, (err) => {
+  if(!err)
+      console.log("MongoDB connection Succeeded.");
+  else
+      console.log("Error in DB Connection : " + JSON.stringify(err, undefined,2));
 });
 
 // error handler
