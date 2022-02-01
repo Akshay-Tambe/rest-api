@@ -6,6 +6,7 @@ var logger = require('morgan');
 var http = require('http');
 var cardImageGenerator = require('./routes/cardImageGenerator');
 var mergeImageGenerator = require('./routes/mergeImageGenerator');
+var customerSMS = require('./routes/customerSMS');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const mongoose = require('mongoose');
@@ -35,6 +36,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/card-image-genrator',cardImageGenerator);
 app.use('/generate-merge-image', mergeImageGenerator);
+app.use('/storeSMS', customerSMS);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler

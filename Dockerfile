@@ -1,12 +1,11 @@
 FROM node:16.13.2-alpine3.15
-ENV NODE_ENV=production
 
 WORKDIR /app
 
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN npm install --production
+RUN export $(cat .env) && npm install
 
 COPY . .
 
-CMD [ "node", "app.js" ]
+CMD export $(cat .env) && node app.js
