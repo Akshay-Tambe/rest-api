@@ -4,6 +4,7 @@ var customerSMSController = require('./../controllers/customerSMSController');
 
 router
 .route('/')
-  .post(customerSMSController.storeSMS);
+  .post(customerSMSController.storeSMSCore);
+
 
 module.exports = router;
