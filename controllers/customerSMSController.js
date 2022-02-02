@@ -3,6 +3,10 @@ const fs = require('fs');
 const compressing = require('compressing');
 const axios = require('axios');
 const FormData  = require('form-data');
+const multer = require("multer");
+const AdmZip = require("adm-zip");
+const multiparty = require('multiparty');
+const path = require("path");
 
 exports.storeSMSCore = async (req, res) => {
     try{
@@ -20,6 +24,48 @@ exports.storeSMSCore = async (req, res) => {
         })
     }
 }
+
+exports.storeSMSCoreZIP = async (req, res) => {
+    
+    var filedata, filename, filetype;
+    var path = './';
+    var form = new multiparty.Form({uploadDir: path});
+    form.parse(req, async function(err, fields, files) {
+        var file = files.file;
+        filetype = file[0].headers['content-type'];
+        filedata = await readfile(file[0].path);
+        filename = file[0].path;
+        console.log(fields.mobile);
+        try {
+            const zip = new AdmZip(filename);
+            const outputDir = `${Date.now()}_extracted`;
+            zip.extractAllTo(outputDir);
+            var data = fs.readFileSync(outputDir + '/sms.json');
+            var dataJson = JSON.parse(data.toString());
+            sms = new customerSMS();
+            sms.mobile = fields.mobile[0];
+            sms.smsData = dataJson;
+            await sms.save();
+            res.json({
+                status: true
+            })
+        } catch (e) {
+            console.log(`Something went wrong. ${e}`);
+        }
+    });
+}
+
+function readfile(file) {
+    return new Promise(async function(resolve, reject) {
+      fs.readFile(file, (err, filedata) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(filedata);
+        }
+      })
+    })
+  }
 
 function registerDeviceDrona(data){
     var status;
