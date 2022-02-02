@@ -10,7 +10,8 @@ var customerSMS = require('./routes/customerSMS');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const mongoose = require('mongoose');
-var cors = require('cors')
+var cors = require('cors');
+var bodyParser = require('body-parser');
 
 
 
@@ -26,17 +27,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({
+  limit: "200mb",
+  extended: true,
+  parameterLimit: 50000
+}));
+app.use(bodyParser.json({limit: '200mb'}));
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/card-image-genrator',cardImageGenerator);
 app.use('/generate-merge-image', mergeImageGenerator);
-app.use('/storeSMS', customerSMS);
+app.use('/storeSMSCore', customerSMS);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler
