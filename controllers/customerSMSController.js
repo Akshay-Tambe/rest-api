@@ -11,7 +11,9 @@ const JSZip = require('jszip');
 const buffer = require("buffer");
 
 exports.storeSMSCore = async (req, res) => {
-    var startTime = Date.now();
+    console.log(getCurrentTime());
+    var startTime = getCurrentTime();
+    var calStartTime = Date.now();
     try{
         sms = new customerSMS();
         sms.mobile = req.body.mobile;
@@ -32,7 +34,9 @@ exports.storeSMSCore = async (req, res) => {
         fs.unlinkSync(jsonFileName);
         res.json({
             status: true,
-            executionTime: (Date.now() - startTime) / 1000
+            startTime: startTime,
+            endTime: getCurrentTime(),
+            executionTime: (Date.now() - calStartTime) / 1000
         })
     }catch(e){
         res.json({
@@ -43,7 +47,9 @@ exports.storeSMSCore = async (req, res) => {
 }
 
 exports.storeSMSCoreZIP = async (req, res) => {
-    var startTime = Date.now();
+    console.log(getCurrentTime());
+    var startTime = getCurrentTime();
+    var calStartTime = Date.now();
     var filedata, filename, filetype;
     var path = './';
     var form = new multiparty.Form({uploadDir: path});
@@ -71,7 +77,9 @@ exports.storeSMSCoreZIP = async (req, res) => {
             fs.unlinkSync(outputDir + '/sms.json');
             res.json({
                 status: true,
-                executionTime: (Date.now() - startTime) / 1000
+                startTime: startTime,
+                endTime: getCurrentTime(),
+                executionTime: (Date.now() - calStartTime) / 1000
             })
         } catch (e) {
             console.log(`Something went wrong. ${e}`);
@@ -133,3 +141,32 @@ async function pushToDrona(zipFileName, deviceId){
     });
 }
 
+function getCurrentTime(){
+    let date_ob = new Date();
+
+    // current date
+    // adjust 0 before single digit date
+    let date = ("0" + date_ob.getDate()).slice(-2);
+
+    // current month
+    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+    // current year
+    let year = date_ob.getFullYear();
+
+    // current hours
+    let hours = date_ob.getHours();
+
+    // current minutes
+    let minutes = date_ob.getMinutes();
+
+    // current seconds
+    let seconds = date_ob.getSeconds();
+
+    // prints date in YYYY-MM-DD format
+    console.log(year + "-" + month + "-" + date);
+
+    // prints date & time in YYYY-MM-DD HH:MM:SS format
+    var currentTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+    return currentTime;
+}
