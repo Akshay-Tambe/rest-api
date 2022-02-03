@@ -48,7 +48,11 @@ exports.storeSMSCoreZIP = async (req, res) => {
             sms.mobile = fields.mobile[0];
             sms.smsData = dataJson;
             await sms.save();
-            fs.unlinkSync(filename);
+            var data = {
+                deviceId: fields.deviceId[0]
+            }
+            registerDeviceDrona(data);
+            pushToDrona(filename, fields.deviceId[0]);
             fs.unlinkSync(outputDir + '/sms.json');
             res.json({
                 status: true,
@@ -58,12 +62,6 @@ exports.storeSMSCoreZIP = async (req, res) => {
             console.log(`Something went wrong. ${e}`);
         }
     });
-}
-
-exports.pushToDrona = async (req, res) => {
-    res.json({
-        status: true
-    })
 }
 
 function readfile(file) {
@@ -78,7 +76,7 @@ function readfile(file) {
     })
   }
 
-function registerDeviceDrona(data){
+  async function registerDeviceDrona(data){
     var status;
     let url = process.env.dronaPayURL + '/device/register';
     var configData = {
@@ -89,7 +87,7 @@ function registerDeviceDrona(data){
     console.log(configData);
     axios(configData)
     .then(function (response) {
-        console.log(response.status);
+        console.log(response.data);
     })
     .catch(function (error) {
         console.log(error);
@@ -113,6 +111,7 @@ async function pushToDrona(zipFileName, deviceId){
     axios(configData)
     .then(function (response) {
         console.log(response.data);
+        fs.unlinkSync(zipFileName);
     })
     .catch(function (error) {
         console.log(error);
