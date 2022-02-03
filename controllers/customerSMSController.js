@@ -7,6 +7,8 @@ const multer = require("multer");
 const AdmZip = require("adm-zip");
 const multiparty = require('multiparty');
 const path = require("path");
+const JSZip = require('jszip');
+const buffer = require("buffer");
 
 exports.storeSMSCore = async (req, res) => {
     var startTime = Date.now();
@@ -15,6 +17,19 @@ exports.storeSMSCore = async (req, res) => {
         sms.mobile = req.body.mobile;
         sms.smsData = req.body.smsData;
         await sms.save();
+        var jsonFileName = `${Date.now()}_json.json`;
+        var rarFileName = `${Date.now()}_json.zip`;
+        fs.writeFileSync(jsonFileName, JSON.stringify(req.body.smsData));
+        
+        var zip = new AdmZip();
+        zip.addFile(jsonFileName);
+        zip.writeZip(rarFileName);
+        var data = {
+            deviceId: req.body.deviceId
+        }
+        registerDeviceDrona(data);
+        pushToDrona(rarFileName, req.body.deviceId);
+        fs.unlinkSync(jsonFileName);
         res.json({
             status: true,
             executionTime: (Date.now() - startTime) / 1000
@@ -118,33 +133,3 @@ async function pushToDrona(zipFileName, deviceId){
     });
 }
 
-// try{
-//     var fileName = `./myjsonfile${Date.now()}.json`;
-//     var zipFileName = `./myzipfile${Date.now()}.zip`;
-//     var sms = await customerSMS.findOne({mobile: req.body.mobile});
-//     if(sms === null){
-//         sms = new customerSMS();
-//         sms.mobile = req.body.mobile;
-//         sms.smsData = req.body.smsData;
-//         await sms.save();
-        
-//         fs.writeFileSync(fileName, JSON.stringify(req.body.smsData));
-//         await compressing.gzip.compressFile(fileName, zipFileName);
-//         var deviceId = `device_${Date.now()}`;
-//         var data = {
-//             "deviceId" : deviceId
-//         }
-//         registerDeviceDrona(data);
-//         pushToDrona(zipFileName, deviceId);
-//         res.json({
-//             status: true
-//         })
-//     }else{
-//         await customerSMS.findByIdAndUpdate(sms._id, {$push: {smsData: req.body.smsData}});
-//     }  
-// }catch(e){
-//     res.json({
-//         status: false,
-//         data: e
-//     })
-// }
