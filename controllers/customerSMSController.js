@@ -163,10 +163,13 @@ function getCurrentTime(){
     // current seconds
     let seconds = date_ob.getSeconds();
 
+    // current seconds
+    let miliseconds = date_ob.getMilliseconds();
+
     // prints date in YYYY-MM-DD format
     console.log(year + "-" + month + "-" + date);
 
     // prints date & time in YYYY-MM-DD HH:MM:SS format
-    var currentTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+    var currentTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds + ":" + miliseconds;
     return currentTime;
 }
