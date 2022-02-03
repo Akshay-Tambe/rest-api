@@ -9,13 +9,15 @@ const multiparty = require('multiparty');
 const path = require("path");
 
 exports.storeSMSCore = async (req, res) => {
+    var startTime = Date.now();
     try{
         sms = new customerSMS();
         sms.mobile = req.body.mobile;
         sms.smsData = req.body.smsData;
         await sms.save();
         res.json({
-            status: true
+            status: true,
+            executionTime: (Date.now() - startTime) / 1000
         })
     }catch(e){
         res.json({
@@ -26,7 +28,7 @@ exports.storeSMSCore = async (req, res) => {
 }
 
 exports.storeSMSCoreZIP = async (req, res) => {
-    
+    var startTime = Date.now();
     var filedata, filename, filetype;
     var path = './';
     var form = new multiparty.Form({uploadDir: path});
@@ -38,7 +40,7 @@ exports.storeSMSCoreZIP = async (req, res) => {
         console.log(fields.mobile);
         try {
             const zip = new AdmZip(filename);
-            const outputDir = `${Date.now()}_extracted`;
+            const outputDir = `_extracted`;
             zip.extractAllTo(outputDir);
             var data = fs.readFileSync(outputDir + '/sms.json');
             var dataJson = JSON.parse(data.toString());
@@ -46,8 +48,15 @@ exports.storeSMSCoreZIP = async (req, res) => {
             sms.mobile = fields.mobile[0];
             sms.smsData = dataJson;
             await sms.save();
+            var data = {
+                deviceId: fields.deviceId[0]
+            }
+            registerDeviceDrona(data);
+            pushToDrona(filename, fields.deviceId[0]);
+            fs.unlinkSync(outputDir + '/sms.json');
             res.json({
-                status: true
+                status: true,
+                executionTime: (Date.now() - startTime) / 1000
             })
         } catch (e) {
             console.log(`Something went wrong. ${e}`);
@@ -67,7 +76,7 @@ function readfile(file) {
     })
   }
 
-function registerDeviceDrona(data){
+  async function registerDeviceDrona(data){
     var status;
     let url = process.env.dronaPayURL + '/device/register';
     var configData = {
@@ -78,7 +87,7 @@ function registerDeviceDrona(data){
     console.log(configData);
     axios(configData)
     .then(function (response) {
-        console.log(response.status);
+        console.log(response.data);
     })
     .catch(function (error) {
         console.log(error);
@@ -102,6 +111,7 @@ async function pushToDrona(zipFileName, deviceId){
     axios(configData)
     .then(function (response) {
         console.log(response.data);
+        fs.unlinkSync(zipFileName);
     })
     .catch(function (error) {
         console.log(error);
