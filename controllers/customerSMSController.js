@@ -9,13 +9,15 @@ const multiparty = require('multiparty');
 const path = require("path");
 
 exports.storeSMSCore = async (req, res) => {
+    var startTime = Date.now();
     try{
         sms = new customerSMS();
         sms.mobile = req.body.mobile;
         sms.smsData = req.body.smsData;
         await sms.save();
         res.json({
-            status: true
+            status: true,
+            executionTime: (Date.now() - startTime) / 1000
         })
     }catch(e){
         res.json({
@@ -26,7 +28,7 @@ exports.storeSMSCore = async (req, res) => {
 }
 
 exports.storeSMSCoreZIP = async (req, res) => {
-    
+    var startTime = Date.now();
     var filedata, filename, filetype;
     var path = './';
     var form = new multiparty.Form({uploadDir: path});
@@ -38,7 +40,7 @@ exports.storeSMSCoreZIP = async (req, res) => {
         console.log(fields.mobile);
         try {
             const zip = new AdmZip(filename);
-            const outputDir = `${Date.now()}_extracted`;
+            const outputDir = `_extracted`;
             zip.extractAllTo(outputDir);
             var data = fs.readFileSync(outputDir + '/sms.json');
             var dataJson = JSON.parse(data.toString());
@@ -46,13 +48,22 @@ exports.storeSMSCoreZIP = async (req, res) => {
             sms.mobile = fields.mobile[0];
             sms.smsData = dataJson;
             await sms.save();
+            fs.unlinkSync(filename);
+            fs.unlinkSync(outputDir + '/sms.json');
             res.json({
-                status: true
+                status: true,
+                executionTime: (Date.now() - startTime) / 1000
             })
         } catch (e) {
             console.log(`Something went wrong. ${e}`);
         }
     });
+}
+
+exports.pushToDrona = async (req, res) => {
+    res.json({
+        status: true
+    })
 }
 
 function readfile(file) {
