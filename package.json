@@ -6,6 +6,7 @@
     "start": ""
   },
   "dependencies": {
+    "adm-zip": "^0.5.9",
     "aws-sdk": "^2.1053.0",
     "axios": "^0.25.0",
     "axios-form-data": "^1.0.0",
@@ -22,6 +23,8 @@
     "jimp": "^0.16.1",
     "mongoose": "^6.1.5",
     "morgan": "~1.9.1",
+    "multer": "^1.4.4",
+    "multiparty": "^4.2.3",
     "node-input-validator": "^4.5.0",
     "swagger-ui-express": "^4.3.0"
   }
