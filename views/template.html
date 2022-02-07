@@ -14,17 +14,14 @@
         @page {
         	/*header: page-header;*/
         	footer: page-footer;
-        	margin-footer: 10px;
         }
     </style>
     <title>Loan Agreement</title>
   </head>
   <body>
-        <htmlpagefooter name="page-footer">
-            <div style="text-align:center; border-top:1px solid #000;">
-        	    Digitally Signed by : {{data.deviceId}} {{data.ip}} {{data.cutsomerName}}
-        	</div>
-        </htmlpagefooter>
+    <div id="pageFooter">
+        Digitally signed by {{data.cutsomerName}} - {{data.deviceId}} - {{data.ip}} - {{data.currentTime}}
+    </div>
     <div class="container">
         <div>
             <img src="http://4review.firstquadrant.co.in/firstpay_dev/public/images/apollo_logo.png" width="100">
