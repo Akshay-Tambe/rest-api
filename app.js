@@ -7,6 +7,7 @@ var http = require('http');
 var cardImageGenerator = require('./routes/cardImageGenerator');
 var mergeImageGenerator = require('./routes/mergeImageGenerator');
 var customerSMS = require('./routes/customerSMS');
+var clickAndWrap = require('./routes/clickAndWrap');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const mongoose = require('mongoose');
@@ -43,6 +44,7 @@ app.use('/users', usersRouter);
 app.use('/card-image-genrator',cardImageGenerator);
 app.use('/generate-merge-image', mergeImageGenerator);
 app.use('/storeSMSCore', customerSMS);
+app.use('/clickAndWrap', clickAndWrap);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler
