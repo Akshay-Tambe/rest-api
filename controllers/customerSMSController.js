@@ -14,11 +14,8 @@ exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
     var startTime = getCurrentTime();
     var calStartTime = Date.now();
+
     try{
-        sms = new customerSMS();
-        sms.mobile = req.body.mobile;
-        sms.smsData = req.body.smsData;
-        await sms.save();
         var jsonFileName = `${Date.now()}_json.json`;
         var rarFileName = `${Date.now()}_json.zip`;
         fs.writeFileSync(jsonFileName, JSON.stringify(req.body.smsData));
@@ -26,18 +23,39 @@ exports.storeSMSCore = async (req, res) => {
         var zip = new AdmZip();
         zip.addFile(jsonFileName);
         zip.writeZip(rarFileName);
-        var data = {
-            deviceId: req.body.deviceId
+        
+
+        var mobile = await customerSMS.findOne({mobile: req.body.mobile});
+        
+        if(mobile === null){
+            var sms = new customerSMS();
+            sms.mobile = req.body.mobile;
+            sms.smsData = req.body.smsData;
+            await sms.save();
+            
+            var data = {
+                deviceId: req.body.deviceId
+            }
+            registerDeviceDrona(data);
+            pushToDrona(rarFileName, req.body.deviceId);
+            fs.unlinkSync(jsonFileName);
+            res.json({
+                status: true,
+                startTime: startTime,
+                endTime: getCurrentTime(),
+                executionTime: (Date.now() - calStartTime) / 1000
+            })
+        }else{
+            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smsData: req.body.smsData}});
+            pushToDrona(rarFileName, req.body.deviceId);
+            fs.unlinkSync(jsonFileName);
+            res.json({
+                status: true,
+                startTime: startTime,
+                endTime: getCurrentTime(),
+                executionTime: (Date.now() - calStartTime) / 1000
+            })
         }
-        registerDeviceDrona(data);
-        pushToDrona(rarFileName, req.body.deviceId);
-        fs.unlinkSync(jsonFileName);
-        res.json({
-            status: true,
-            startTime: startTime,
-            endTime: getCurrentTime(),
-            executionTime: (Date.now() - calStartTime) / 1000
-        })
     }catch(e){
         res.json({
             status: false,
