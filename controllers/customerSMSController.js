@@ -119,9 +119,9 @@ function readfile(file) {
 
 async function pushToDrona(zipFileName, deviceId){
     const form_data = new FormData();
-    form_data.append("deviceId", deviceId);
+    // form_data.append("deviceId", deviceId);
     form_data.append("file", fs.createReadStream(zipFileName));
-    let url = process.env.dronaPayURL + '/device/file';
+    let url = process.env.dronaPayURL + '/device/file/' + deviceId;
     var configData = {
         method: 'post',
         url: url,
