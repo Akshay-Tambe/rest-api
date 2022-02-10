@@ -29,7 +29,8 @@ exports.storeSMSCore = async (req, res) => {
 
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
         var checkDevice = await checkDronaDevice(req.body.deviceId);
-        if(mobile === null && checkDevice === false){
+        console.log("check device: " + checkDevice)
+        if(mobile === null){
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
             sms.smslog = req.body.smslog;
@@ -39,7 +40,9 @@ exports.storeSMSCore = async (req, res) => {
             var data = {
                 deviceId: req.body.deviceId
             }
-            registerDeviceDrona(data);
+            if(checkDevice === false){
+                registerDeviceDrona(data);
+            }
             pushToDrona(rarFileName, req.body.deviceId);
             fs.unlinkSync(jsonFileName);
             res.json({
