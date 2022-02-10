@@ -9,6 +9,7 @@ const multiparty = require('multiparty');
 const path = require("path");
 const JSZip = require('jszip');
 const buffer = require("buffer");
+const {parse, stringify, toJSON, fromJSON} = require('flatted');
 
 exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
@@ -30,7 +31,7 @@ exports.storeSMSCore = async (req, res) => {
         if(mobile === null){
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
-            sms.smsData = req.body.smslog;
+            sms.smslog = req.body.smslog;
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
@@ -47,7 +48,7 @@ exports.storeSMSCore = async (req, res) => {
                 executionTime: (Date.now() - calStartTime) / 1000
             })
         }else{
-            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smsData: req.body.smslog}});
+            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: req.body.smslog}});
             pushToDrona(rarFileName, req.body.deviceId);
             fs.unlinkSync(jsonFileName);
             res.json({
@@ -196,9 +197,16 @@ function getCurrentTime(){
 exports.fetchDronaData = async (req, res) => {
     var deviceId = req.params.deviceId;
     var data = await fetchFromDrona(deviceId);
-    res.json({
-        status: JSON.parse(data)
-    })
+    var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
+    if(sms !== null){
+        res.json({
+            status: true
+        })
+    }else{
+        res.json({
+            status: false
+        })
+    }
 }
 
 function fetchFromDrona(deviceId){
@@ -211,7 +219,8 @@ function fetchFromDrona(deviceId){
         console.log(configData);
         axios(configData)
         .then(function (response) {
-            resolve(response)
+            console.log(response.data);
+            resolve(response.data)
         })
         .catch(function (error) {
             console.log(error);

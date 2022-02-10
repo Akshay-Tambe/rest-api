@@ -31,6 +31,9 @@ const customerSMS = new smsSchema({
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    dronaData: {
+        type: Array
     }
 });
 
