@@ -10,5 +10,9 @@ router
 .route('/storeSMSCoreZIP')
   .post(customerSMSController.storeSMSCoreZIP);
 
+router
+.route('/fetchDronaData/:deviceId')
+  .get(customerSMSController.fetchDronaData);
+
 
 module.exports = router;
