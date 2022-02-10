@@ -6,16 +6,20 @@ const customerSMS = new smsSchema({
         type: Number,
         required: true
     },
-    smsData: [{
-        dateOfSMS: {
+    deviceId: {
+        type: String,
+        required: true
+    },
+    smslog: [{
+        date_sent: {
             type: Date,
             required: true
         },
-        sms: {
+        body: {
             type: String,
             required: true
         },
-        senderId: {
+        origin: {
             type: String,
             required: true
         },
