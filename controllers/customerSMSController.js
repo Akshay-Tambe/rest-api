@@ -15,7 +15,8 @@ exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
     var startTime = getCurrentTime();
     var calStartTime = Date.now();
-
+    
+    
     try{
         var jsonFileName = `${Date.now()}_json.json`;
         var rarFileName = `${Date.now()}_json.zip`;
@@ -27,8 +28,8 @@ exports.storeSMSCore = async (req, res) => {
         
 
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
-        
-        if(mobile === null){
+        var checkDevice = await checkDronaDevice(req.body.deviceId);
+        if(mobile === null && checkDevice === false){
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
             sms.smslog = req.body.smslog;
@@ -107,6 +108,29 @@ exports.storeSMSCoreZIP = async (req, res) => {
     });
 }
 
+function checkDronaDevice(deviceId) {
+    return new Promise(async function(resolve, reject) {
+        let url = process.env.dronaPayURL + '/device/' + deviceId;
+        var configData = {
+            method: 'get',
+            url: url
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            console.log(response.data);
+            if(response.data.record_Status === 0){
+                resolve(true)
+            }else if(response.data.status === 404){
+                reject(false)
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    })
+}
+
 function readfile(file) {
     return new Promise(async function(resolve, reject) {
       fs.readFile(file, (err, filedata) => {
@@ -117,7 +141,7 @@ function readfile(file) {
         }
       })
     })
-  }
+}
 
   async function registerDeviceDrona(data){
     var status;
