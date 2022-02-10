@@ -18,7 +18,7 @@ exports.storeSMSCore = async (req, res) => {
     try{
         var jsonFileName = `${Date.now()}_json.json`;
         var rarFileName = `${Date.now()}_json.zip`;
-        fs.writeFileSync(jsonFileName, JSON.stringify(req.body.smsData));
+        fs.writeFileSync(jsonFileName, JSON.stringify(req.body));
         
         var zip = new AdmZip();
         zip.addFile(jsonFileName);
@@ -30,7 +30,8 @@ exports.storeSMSCore = async (req, res) => {
         if(mobile === null){
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
-            sms.smsData = req.body.smsData;
+            sms.smsData = req.body.smslog;
+            sms.deviceId = req.body.deviceId;
             await sms.save();
             
             var data = {
@@ -46,7 +47,7 @@ exports.storeSMSCore = async (req, res) => {
                 executionTime: (Date.now() - calStartTime) / 1000
             })
         }else{
-            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smsData: req.body.smsData}});
+            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smsData: req.body.smslog}});
             pushToDrona(rarFileName, req.body.deviceId);
             fs.unlinkSync(jsonFileName);
             res.json({
@@ -190,4 +191,31 @@ function getCurrentTime(){
     // prints date & time in YYYY-MM-DD HH:MM:SS format
     var currentTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds + ":" + miliseconds;
     return currentTime;
+}
+
+exports.fetchDronaData = async (req, res) => {
+    var deviceId = req.params.deviceId;
+    var data = await fetchFromDrona(deviceId);
+    res.json({
+        status: JSON.parse(data)
+    })
+}
+
+function fetchFromDrona(deviceId){
+    return new Promise(async function(resolve, reject) {
+        let url = process.env.dronaPayURL + '/device/profile/' + deviceId;
+        var configData = {
+            method: 'get',
+            url: url
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            resolve(response)
+        })
+        .catch(function (error) {
+            console.log(error);
+            reject(error)
+        });
+    })
 }
