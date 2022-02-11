@@ -16,16 +16,25 @@ exports.storeSMSCore = async (req, res) => {
     var startTime = getCurrentTime();
     var calStartTime = Date.now();
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
-    
-    
+    var smslogs = req.body.smslog;
+    var smslog = [];
+    smslogs.forEach(sms => {
+        const event = new Date(sms.date_sent);
+        var datetime = event.toISOString();
+        smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
+    });
+    var dataToDrona = {
+        deviceId: req.body.deviceId,
+        smslog: smslog
+    }
     try{
-        // var jsonFileName = `${Date.now()}_json.json`;
-        // var rarFileName = `${Date.now()}_json.zip`;
-        // fs.writeFileSync(jsonFileName, JSON.stringify(req.body));
+        var jsonFileName = `${Date.now()}_json.json`;
+        var rarFileName = `${Date.now()}_json.zip`;
+        fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
         
-        // var zip = new AdmZip();
-        // zip.addFile(jsonFileName);
-        // zip.writeZip(rarFileName);
+        var zip = new AdmZip();
+        zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
+        zip.writeZip(rarFileName);
         
 
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
@@ -39,38 +48,31 @@ exports.storeSMSCore = async (req, res) => {
             var data = {
                 deviceId: req.body.deviceId
             }
-            // fs.unlinkSync(jsonFileName);
+            var checkDevice = await checkDronaDevice(req.body.deviceId);
+            if(checkDevice === true){
+                registerDeviceDrona(data);
+                pushToDrona(rarFileName, req.body.deviceId);
+                fs.unlinkSync(jsonFileName);
                 res.json({
                     status: true,
                     startTime: startTime,
                     endTime: getCurrentTime(),
                     executionTime: (Date.now() - calStartTime) / 1000
                 })
-            // var checkDevice = await checkDronaDevice(req.body.deviceId);
-            // if(checkDevice === true){
-            //     registerDeviceDrona(data);
-            //     pushToDrona(rarFileName, req.body.deviceId);
-            //     fs.unlinkSync(jsonFileName);
-            //     res.json({
-            //         status: true,
-            //         startTime: startTime,
-            //         endTime: getCurrentTime(),
-            //         executionTime: (Date.now() - calStartTime) / 1000
-            //     })
-            // }else{
-            //     pushToDrona(rarFileName, req.body.deviceId);
-            //     fs.unlinkSync(jsonFileName);
-            //     res.json({
-            //         status: true,
-            //         startTime: startTime,
-            //         endTime: getCurrentTime(),
-            //         executionTime: (Date.now() - calStartTime) / 1000
-            //     })
-            // }
+            }else{
+                pushToDrona(rarFileName, req.body.deviceId);
+                fs.unlinkSync(jsonFileName);
+                res.json({
+                    status: true,
+                    startTime: startTime,
+                    endTime: getCurrentTime(),
+                    executionTime: (Date.now() - calStartTime) / 1000
+                })
+            }
         }else{
             var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: req.body.smslog}});
-            // pushToDrona(rarFileName, req.body.deviceId);
-            // fs.unlinkSync(jsonFileName);
+            pushToDrona(rarFileName, req.body.deviceId);
+            fs.unlinkSync(jsonFileName);
             res.json({
                 status: true,
                 startTime: startTime,
@@ -194,7 +196,7 @@ async function pushToDrona(zipFileName, deviceId){
     axios(configData)
     .then(function (response) {
         console.log(response.data);
-        fs.unlinkSync(zipFileName);
+        // fs.unlinkSync(zipFileName);
     })
     .catch(function (error) {
         console.log(error);
