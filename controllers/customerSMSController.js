@@ -19,13 +19,13 @@ exports.storeSMSCore = async (req, res) => {
     
     
     try{
-        var jsonFileName = `${Date.now()}_json.json`;
-        var rarFileName = `${Date.now()}_json.zip`;
-        fs.writeFileSync(jsonFileName, JSON.stringify(req.body));
+        // var jsonFileName = `${Date.now()}_json.json`;
+        // var rarFileName = `${Date.now()}_json.zip`;
+        // fs.writeFileSync(jsonFileName, JSON.stringify(req.body));
         
-        var zip = new AdmZip();
-        zip.addFile(jsonFileName);
-        zip.writeZip(rarFileName);
+        // var zip = new AdmZip();
+        // zip.addFile(jsonFileName);
+        // zip.writeZip(rarFileName);
         
 
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
@@ -39,31 +39,38 @@ exports.storeSMSCore = async (req, res) => {
             var data = {
                 deviceId: req.body.deviceId
             }
-            var checkDevice = await checkDronaDevice(req.body.deviceId);
-            if(checkDevice === true){
-                registerDeviceDrona(data);
-                pushToDrona(rarFileName, req.body.deviceId);
-                fs.unlinkSync(jsonFileName);
+            // fs.unlinkSync(jsonFileName);
                 res.json({
                     status: true,
                     startTime: startTime,
                     endTime: getCurrentTime(),
                     executionTime: (Date.now() - calStartTime) / 1000
                 })
-            }else{
-                pushToDrona(rarFileName, req.body.deviceId);
-                fs.unlinkSync(jsonFileName);
-                res.json({
-                    status: true,
-                    startTime: startTime,
-                    endTime: getCurrentTime(),
-                    executionTime: (Date.now() - calStartTime) / 1000
-                })
-            }
+            // var checkDevice = await checkDronaDevice(req.body.deviceId);
+            // if(checkDevice === true){
+            //     registerDeviceDrona(data);
+            //     pushToDrona(rarFileName, req.body.deviceId);
+            //     fs.unlinkSync(jsonFileName);
+            //     res.json({
+            //         status: true,
+            //         startTime: startTime,
+            //         endTime: getCurrentTime(),
+            //         executionTime: (Date.now() - calStartTime) / 1000
+            //     })
+            // }else{
+            //     pushToDrona(rarFileName, req.body.deviceId);
+            //     fs.unlinkSync(jsonFileName);
+            //     res.json({
+            //         status: true,
+            //         startTime: startTime,
+            //         endTime: getCurrentTime(),
+            //         executionTime: (Date.now() - calStartTime) / 1000
+            //     })
+            // }
         }else{
             var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: req.body.smslog}});
-            pushToDrona(rarFileName, req.body.deviceId);
-            fs.unlinkSync(jsonFileName);
+            // pushToDrona(rarFileName, req.body.deviceId);
+            // fs.unlinkSync(jsonFileName);
             res.json({
                 status: true,
                 startTime: startTime,
