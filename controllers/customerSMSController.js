@@ -28,13 +28,13 @@ exports.storeSMSCore = async (req, res) => {
         smslog: smslog
     }
     try{
-        var jsonFileName = `${Date.now()}_json.json`;
-        var rarFileName = `${Date.now()}_json.zip`;
-        fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
+        // var jsonFileName = `${Date.now()}_json.json`;
+        // var rarFileName = `${Date.now()}_json.zip`;
+        // fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
         
-        var zip = new AdmZip();
-        zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
-        zip.writeZip(rarFileName);
+        // var zip = new AdmZip();
+        // zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
+        // zip.writeZip(rarFileName);
         
 
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
@@ -45,34 +45,37 @@ exports.storeSMSCore = async (req, res) => {
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
-            var data = {
-                deviceId: req.body.deviceId
-            }
-            var checkDevice = await checkDronaDevice(req.body.deviceId);
-            if(checkDevice === true){
-                registerDeviceDrona(data);
-                pushToDrona(rarFileName, req.body.deviceId);
-                fs.unlinkSync(jsonFileName);
+            // var data = {
+            //     deviceId: req.body.deviceId
+            // }
+            // var checkDevice = await checkDronaDevice(req.body.deviceId);
+            // if(checkDevice === true){
+                // registerDeviceDrona(data);
+                // pushToDrona(rarFileName, req.body.deviceId);
+                // fs.unlinkSync(jsonFileName);
+                // await fetchDronaData(req.body.deviceId);
                 res.json({
                     status: true,
                     startTime: startTime,
                     endTime: getCurrentTime(),
                     executionTime: (Date.now() - calStartTime) / 1000
                 })
-            }else{
-                pushToDrona(rarFileName, req.body.deviceId);
-                fs.unlinkSync(jsonFileName);
-                res.json({
-                    status: true,
-                    startTime: startTime,
-                    endTime: getCurrentTime(),
-                    executionTime: (Date.now() - calStartTime) / 1000
-                })
-            }
+            // }else{
+                // pushToDrona(rarFileName, req.body.deviceId);
+                // fs.unlinkSync(jsonFileName);
+                // await fetchDronaData(req.body.deviceId);
+                // res.json({
+                //     status: true,
+                //     startTime: startTime,
+                //     endTime: getCurrentTime(),
+                //     executionTime: (Date.now() - calStartTime) / 1000
+                // })
+            // }
         }else{
-            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: req.body.smslog}});
-            pushToDrona(rarFileName, req.body.deviceId);
-            fs.unlinkSync(jsonFileName);
+            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
+            // pushToDrona(rarFileName, req.body.deviceId);
+            // fs.unlinkSync(jsonFileName);
+            // await fetchDronaData(req.body.deviceId);
             res.json({
                 status: true,
                 startTime: startTime,
@@ -196,7 +199,7 @@ async function pushToDrona(zipFileName, deviceId){
     axios(configData)
     .then(function (response) {
         console.log(response.data);
-        // fs.unlinkSync(zipFileName);
+        fs.unlinkSync(zipFileName);
     })
     .catch(function (error) {
         console.log(error);
@@ -236,19 +239,18 @@ function getCurrentTime(){
     return currentTime;
 }
 
-exports.fetchDronaData = async (req, res) => {
-    var deviceId = req.params.deviceId;
-    var data = await fetchFromDrona(deviceId);
-    var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
-    if(sms !== null){
-        res.json({
-            status: true
-        })
-    }else{
-        res.json({
-            status: false
-        })
-    }
+// exports.fetchDronaData = async (req, res) => {
+function fetchDronaData(deviceId){
+    return new Promise(async function(resolve, reject) {
+        // var deviceId = req.params.deviceId;
+        var data = await fetchFromDrona(deviceId);
+        var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
+        if(sms !== null){
+            resolve(true);
+        }else{
+            resolve(false);
+        }
+    })
 }
 
 function fetchFromDrona(deviceId){
