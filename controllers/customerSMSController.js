@@ -16,7 +16,7 @@ exports.storeSMSCore = async (req, res) => {
     var calStartTime = Date.now();
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
     var smslogs = req.body.smslog;
-    console.log('request', $req.body);
+    console.log('request', req.body);
     // var smslog = [];
     // smslogs.forEach(sms => {
     //     const event = new Date(sms.date_sent);
@@ -41,7 +41,7 @@ exports.storeSMSCore = async (req, res) => {
         if(mobile === null){
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
-            sms.smslog = req.body.smslog;
+            sms.smslog = smslogs;
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
