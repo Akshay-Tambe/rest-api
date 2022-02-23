@@ -16,7 +16,7 @@ exports.storeSMSCore = async (req, res) => {
     var calStartTime = Date.now();
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
     var smslogs = req.body.smslog;
-    console.log('request', req.body);
+    // console.log('request', req.body);
     // var smslog = [];
     // smslogs.forEach(sms => {
     //     const event = new Date(sms.date_sent);
@@ -36,7 +36,7 @@ exports.storeSMSCore = async (req, res) => {
         // zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
         // zip.writeZip(rarFileName);
         
-
+        
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
         if(mobile === null){
             var sms = new customerSMS();
@@ -79,7 +79,7 @@ exports.storeSMSCore = async (req, res) => {
             //     })
             // }
         }else{
-            var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
+            // var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
             // pushToDrona(rarFileName, req.body.deviceId);
             // fs.unlinkSync(jsonFileName);
             // await fetchDronaData(req.body.deviceId);
