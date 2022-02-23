@@ -11,8 +11,8 @@ router
   .post(customerSMSController.storeSMSCoreZIP);
 
 router
-  .route('/fetchDronaData/:deviceId')
-    .get(customerSMSController.fetchDronaData);
+  .route('/fetchDronaData')
+    .post(customerSMSController.fetchDronaData);
 
 router
 .route('/fetchSMS/:mobile')

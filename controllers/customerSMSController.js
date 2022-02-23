@@ -79,10 +79,17 @@ exports.storeSMSCore = async (req, res) => {
             //     })
             // }
         }else{
+            var recentDateDB = new Date(mobile.smslog[0].date_sent);
+            // var recentDateApp = new Date(smslogs[1].date_sent);
+            for (const smslog of smslogs) {
+                var dateApp = new Date();
+            }
             // var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
             // pushToDrona(rarFileName, req.body.deviceId);
             // fs.unlinkSync(jsonFileName);
             // await fetchDronaData(req.body.deviceId);
+            console.log('recentDateDB', recentDateDB.getTime());
+            console.log('recentDateApp', recentDateApp.getTime());
             res.json({
                 status: true,
                 startTime: startTime,
@@ -247,20 +254,7 @@ function getCurrentTime(){
 }
 
 exports.fetchDronaData = async (req, res) => {
-// function fetchDronaData(deviceId){
-
-    // return new Promise(async function(resolve, reject) {
-    //     var deviceId = req.params.deviceId;
-    //     var data = await fetchFromDrona(deviceId);
-    //     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
-    //     if(sms !== null){
-    //         resolve(true);
-    //     }else{
-    //         resolve(false);
-    //     }
-    // })
-
-    var deviceId = req.params.deviceId;
+    var deviceId = req.body.deviceId;
     var data = await fetchFromDrona(deviceId);
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
@@ -278,8 +272,8 @@ exports.fetchDronaData = async (req, res) => {
     }
 }
 
-function fetchFromDrona(deviceId){
-    return new Promise(async function(resolve, reject) {
+async function fetchFromDrona(deviceId){
+    return new Promise(function(resolve, reject) {
         let url = process.env.dronaPayURL + '/device/profile/' + deviceId;
         var configData = {
             method: 'get',
