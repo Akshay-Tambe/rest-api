@@ -9,7 +9,6 @@ const multiparty = require('multiparty');
 const path = require("path");
 const JSZip = require('jszip');
 const buffer = require("buffer");
-const {parse, stringify, toJSON, fromJSON} = require('flatted');
 
 exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
@@ -17,16 +16,17 @@ exports.storeSMSCore = async (req, res) => {
     var calStartTime = Date.now();
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
     var smslogs = req.body.smslog;
-    var smslog = [];
-    smslogs.forEach(sms => {
-        const event = new Date(sms.date_sent);
-        var datetime = event.toISOString();
-        smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
-    });
-    var dataToDrona = {
-        deviceId: req.body.deviceId,
-        smslog: smslog
-    }
+    console.log('request', $req.body);
+    // var smslog = [];
+    // smslogs.forEach(sms => {
+    //     const event = new Date(sms.date_sent);
+    //     var datetime = event.toISOString();
+    //     smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
+    // });
+    // var dataToDrona = {
+    //     deviceId: req.body.deviceId,
+    //     smslog: smslog
+    // }
     try{
         // var jsonFileName = `${Date.now()}_json.json`;
         // var rarFileName = `${Date.now()}_json.zip`;
@@ -45,31 +45,38 @@ exports.storeSMSCore = async (req, res) => {
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
+            res.json({
+                status: true,
+                startTime: startTime,
+                endTime: getCurrentTime(),
+                executionTime: (Date.now() - calStartTime) / 1000
+            })
+
             // var data = {
             //     deviceId: req.body.deviceId
             // }
             // var checkDevice = await checkDronaDevice(req.body.deviceId);
-            // if(checkDevice === true){
-                // registerDeviceDrona(data);
-                // pushToDrona(rarFileName, req.body.deviceId);
-                // fs.unlinkSync(jsonFileName);
-                // await fetchDronaData(req.body.deviceId);
-                res.json({
-                    status: true,
-                    startTime: startTime,
-                    endTime: getCurrentTime(),
-                    executionTime: (Date.now() - calStartTime) / 1000
-                })
+            // if(checkDevice){
+            //     registerDeviceDrona(data);
+            //     pushToDrona(rarFileName, req.body.deviceId);
+            //     fs.unlinkSync(jsonFileName);
+            //     await fetchDronaData(req.body.deviceId);
+            //     res.json({
+            //         status: true,
+            //         startTime: startTime,
+            //         endTime: getCurrentTime(),
+            //         executionTime: (Date.now() - calStartTime) / 1000
+            //     })
             // }else{
-                // pushToDrona(rarFileName, req.body.deviceId);
-                // fs.unlinkSync(jsonFileName);
-                // await fetchDronaData(req.body.deviceId);
-                // res.json({
-                //     status: true,
-                //     startTime: startTime,
-                //     endTime: getCurrentTime(),
-                //     executionTime: (Date.now() - calStartTime) / 1000
-                // })
+            //     pushToDrona(rarFileName, req.body.deviceId);
+            //     fs.unlinkSync(jsonFileName);
+            //     await fetchDronaData(req.body.deviceId);
+            //     res.json({
+            //         status: true,
+            //         startTime: startTime,
+            //         endTime: getCurrentTime(),
+            //         executionTime: (Date.now() - calStartTime) / 1000
+            //     })
             // }
         }else{
             var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
@@ -164,7 +171,7 @@ function readfile(file) {
     })
 }
 
-  async function registerDeviceDrona(data){
+async function registerDeviceDrona(data){
     
     let url = process.env.dronaPayURL + '/device/register';
     var configData = {
@@ -239,18 +246,36 @@ function getCurrentTime(){
     return currentTime;
 }
 
-// exports.fetchDronaData = async (req, res) => {
-function fetchDronaData(deviceId){
-    return new Promise(async function(resolve, reject) {
-        // var deviceId = req.params.deviceId;
-        var data = await fetchFromDrona(deviceId);
-        var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
-        if(sms !== null){
-            resolve(true);
-        }else{
-            resolve(false);
-        }
-    })
+exports.fetchDronaData = async (req, res) => {
+// function fetchDronaData(deviceId){
+
+    // return new Promise(async function(resolve, reject) {
+    //     var deviceId = req.params.deviceId;
+    //     var data = await fetchFromDrona(deviceId);
+    //     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
+    //     if(sms !== null){
+    //         resolve(true);
+    //     }else{
+    //         resolve(false);
+    //     }
+    // })
+
+    var deviceId = req.params.deviceId;
+    var data = await fetchFromDrona(deviceId);
+    var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
+    if(sms !== null){
+        // resolve(true);
+        res.json({
+            status: true,
+            data: "Data fetch successfully!"
+        })
+    }else{
+        // resolve(false);
+        res.json({
+            status: false,
+            data: "There is an error"
+        })
+    }
 }
 
 function fetchFromDrona(deviceId){
@@ -271,4 +296,23 @@ function fetchFromDrona(deviceId){
             reject(error)
         });
     })
+}
+
+exports.fetchSMS = async (req, res) => {
+    var sms = await customerSMS.findOne({mobile: req.params.mobile});
+    if(sms){
+        res.json({
+            status: true,
+            data: sms
+        })
+    }else{
+        res.json({
+            status: false,
+            data: "No data found"
+        })
+    }
+}
+
+exports.getTransactionFromSMS = async (req, res) => {
+
 }
