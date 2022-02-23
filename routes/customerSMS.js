@@ -11,7 +11,7 @@ router
   .post(customerSMSController.storeSMSCoreZIP);
 
 router
-  .route('/fetchDronaData')
+  .route('/insertDronaData')
     .post(customerSMSController.fetchDronaData);
 
 router
