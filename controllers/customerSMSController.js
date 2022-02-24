@@ -9,6 +9,7 @@ const multiparty = require('multiparty');
 const path = require("path");
 const JSZip = require('jszip');
 const buffer = require("buffer");
+const config = require('./../config/config.js');
 
 exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
@@ -148,7 +149,7 @@ exports.storeSMSCoreZIP = async (req, res) => {
 
 function checkDronaDevice(deviceId) {
     return new Promise(async function(resolve, reject) {
-        let url = process.env.dronaPayURL + '/device/' + deviceId;
+        let url = config.dronaPayURL + '/device/' + deviceId;
         var configData = {
             method: 'get',
             url: url
@@ -254,6 +255,7 @@ function getCurrentTime(){
 }
 
 exports.fetchDronaData = async (req, res) => {
+    console.log('request', req.body.deviceId);
     var deviceId = req.body.deviceId;
     var data = await fetchFromDrona(deviceId);
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
