@@ -314,6 +314,13 @@ exports.getTransactionFromSMS = async (req, res) => {
     var deviceId = req.params.deviceId;
     var dronaData = await customerSMS.findOne({deviceId: deviceId});
     var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
+    var statement = [];
+    for (const bank of banks) {
+        if(typeof bank.repeating_debits === 'undefined')
+            bank.repeating_debits = {};
+        if(typeof bank.repeating_credits === 'undefined')
+            bank.repeating_credits = {};
+    }
     res.json({
         status: true,
         data: banks
