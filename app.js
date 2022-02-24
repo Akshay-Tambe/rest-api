@@ -13,6 +13,8 @@ const swaggerDocument = require('./swagger.json');
 const mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
+const zohoController = require('./controllers/zohoController')
+const consumerSMSController = require('./controllers/customerSMSController');
 
 
 
@@ -46,6 +48,8 @@ app.use('/generate-merge-image', mergeImageGenerator);
 app.use('/storeSMSCore', customerSMS);
 app.use('/clickAndWrap', clickAndWrap);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get('/searchRecord', zohoController.searchRecord);
+app.get('/getTransactionFromSMS/:deviceId', consumerSMSController.getTransactionFromSMS);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

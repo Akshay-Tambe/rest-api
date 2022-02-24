@@ -10,6 +10,7 @@ const path = require("path");
 const JSZip = require('jszip');
 const buffer = require("buffer");
 const config = require('./../config/config.js');
+var json2xls = require('json2xls');
 
 exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
@@ -276,7 +277,7 @@ exports.fetchDronaData = async (req, res) => {
 
 async function fetchFromDrona(deviceId){
     return new Promise(function(resolve, reject) {
-        let url = process.env.dronaPayURL + '/device/profile/' + deviceId;
+        let url = config.dronaPayURL + '/device/profile/' + deviceId;
         var configData = {
             method: 'get',
             url: url
@@ -310,5 +311,11 @@ exports.fetchSMS = async (req, res) => {
 }
 
 exports.getTransactionFromSMS = async (req, res) => {
-
+    var deviceId = req.params.deviceId;
+    var dronaData = await customerSMS.findOne({deviceId: deviceId});
+    var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
+    res.json({
+        status: true,
+        data: banks
+    })
 }
