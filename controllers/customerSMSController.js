@@ -22,24 +22,24 @@ exports.storeSMSCore = async (req, res) => {
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
     var smslogs = req.body.smslog;
     // console.log('request', req.body);
-    // var smslog = [];
-    // smslogs.forEach(sms => {
-    //     const event = new Date(sms.date_sent);
-    //     var datetime = event.toISOString();
-    //     smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
-    // });
-    // var dataToDrona = {
-    //     deviceId: req.body.deviceId,
-    //     smslog: smslog
-    // }
+    var smslog = [];
+    smslogs.forEach(sms => {
+        const event = new Date(sms.date_sent);
+        var datetime = event.toISOString();
+        smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
+    });
+    var dataToDrona = {
+        deviceId: req.body.deviceId,
+        smslog: smslog
+    }
     try{
-        // var jsonFileName = `${Date.now()}_json.json`;
-        // var rarFileName = `${Date.now()}_json.zip`;
-        // fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
+        var jsonFileName = `${Date.now()}_json.json`;
+        var rarFileName = `${Date.now()}_json.zip`;
+        fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
         
-        // var zip = new AdmZip();
-        // zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
-        // zip.writeZip(rarFileName);
+        var zip = new AdmZip();
+        zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
+        zip.writeZip(rarFileName);
         
         
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
@@ -50,51 +50,32 @@ exports.storeSMSCore = async (req, res) => {
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
-            res.json({
-                status: true,
-                startTime: startTime,
-                endTime: getCurrentTime(),
-                executionTime: (Date.now() - calStartTime) / 1000
-            })
-
-            // var data = {
-            //     deviceId: req.body.deviceId
-            // }
-            // var checkDevice = await checkDronaDevice(req.body.deviceId);
-            // if(checkDevice){
-            //     registerDeviceDrona(data);
-            //     pushToDrona(rarFileName, req.body.deviceId);
-            //     fs.unlinkSync(jsonFileName);
-            //     await fetchDronaData(req.body.deviceId);
-            //     res.json({
-            //         status: true,
-            //         startTime: startTime,
-            //         endTime: getCurrentTime(),
-            //         executionTime: (Date.now() - calStartTime) / 1000
-            //     })
-            // }else{
-            //     pushToDrona(rarFileName, req.body.deviceId);
-            //     fs.unlinkSync(jsonFileName);
-            //     await fetchDronaData(req.body.deviceId);
-            //     res.json({
-            //         status: true,
-            //         startTime: startTime,
-            //         endTime: getCurrentTime(),
-            //         executionTime: (Date.now() - calStartTime) / 1000
-            //     })
-            // }
-        }else{
-            var recentDateDB = new Date(mobile.smslog[0].date_sent);
-            // var recentDateApp = new Date(smslogs[1].date_sent);
-            for (const smslog of smslogs) {
-                var dateApp = new Date();
+            var data = {
+                deviceId: req.body.deviceId
             }
-            // var sms = await customerSMS.findOneAndUpdate({mobile: req.body.mobile}, { $push: {smslog: smslogs}});
-            // pushToDrona(rarFileName, req.body.deviceId);
-            // fs.unlinkSync(jsonFileName);
-            // await fetchDronaData(req.body.deviceId);
-            console.log('recentDateDB', recentDateDB.getTime());
-            console.log('recentDateApp', recentDateApp.getTime());
+            var checkDevice = await checkDronaDevice(req.body.deviceId);
+            if(checkDevice){
+                // registerDeviceDrona(data);
+                pushToDrona(rarFileName, req.body.deviceId);
+                fs.unlinkSync(jsonFileName);
+                res.json({
+                    status: true,
+                    startTime: startTime,
+                    endTime: getCurrentTime(),
+                    executionTime: (Date.now() - calStartTime) / 1000
+                })
+            }else{
+                await registerDeviceDrona(data);
+                pushToDrona(rarFileName, req.body.deviceId);
+                fs.unlinkSync(jsonFileName);
+                res.json({
+                    status: true,
+                    startTime: startTime,
+                    endTime: getCurrentTime(),
+                    executionTime: (Date.now() - calStartTime) / 1000
+                })
+            }
+        }else{
             res.json({
                 status: true,
                 startTime: startTime,
@@ -183,45 +164,47 @@ function readfile(file) {
     })
 }
 
-async function registerDeviceDrona(data){
-    
-    let url = process.env.dronaPayURL + '/device/register';
-    var configData = {
-        method: 'post',
-        url: url,
-        data : data
-    };
-    console.log(configData);
-    axios(configData)
-    .then(function (response) {
-        console.log(response.data);
-    })
-    .catch(function (error) {
-        console.log(error);
+function registerDeviceDrona(data){
+    return new Promise(async function(resolve, reject){
+        let url = process.env.dronaPayURL + '/device/register';
+        var configData = {
+            method: 'post',
+            url: url,
+            data : data
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     });
 }
 
 async function pushToDrona(zipFileName, deviceId){
-    const form_data = new FormData();
-    // form_data.append("deviceId", deviceId);
-    form_data.append("file", fs.createReadStream(zipFileName));
-    let url = process.env.dronaPayURL + '/device/file/' + deviceId;
-    var configData = {
-        method: 'post',
-        url: url,
-        data : form_data,
-        headers: {
-            "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary()
-        },
-    };
-    console.log(configData);
-    axios(configData)
-    .then(function (response) {
-        console.log(response.data);
-        fs.unlinkSync(zipFileName);
-    })
-    .catch(function (error) {
-        console.log(error);
+    return new Promise(async function(resolve, reject){
+        const form_data = new FormData();
+        form_data.append("file", fs.createReadStream(zipFileName));
+        let url = process.env.dronaPayURL + '/device/file/' + deviceId;
+        var configData = {
+            method: 'post',
+            url: url,
+            data : form_data,
+            headers: {
+                "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary()
+            },
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            console.log(response.data);
+            fs.unlinkSync(zipFileName);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     });
 }
 
