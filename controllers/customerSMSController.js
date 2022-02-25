@@ -11,6 +11,9 @@ const JSZip = require('jszip');
 const buffer = require("buffer");
 const config = require('./../config/config.js');
 var json2xls = require('json2xls');
+const pdf = require('dynamic-html-pdf');
+const commonController = require('./commonController');
+const zohoController = require('./zohoController');
 
 exports.storeSMSCore = async (req, res) => {
     console.log(getCurrentTime());
@@ -261,10 +264,11 @@ exports.fetchDronaData = async (req, res) => {
     var data = await fetchFromDrona(deviceId);
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
-        // resolve(true);
+        var filename = await getTransactionFromSMS(deviceId);
+        zohoController.updateDronaStatement(sms.mobile, filename);
         res.json({
             status: true,
-            data: "Data fetch successfully!"
+            data: filename
         })
     }else{
         // resolve(false);
@@ -310,19 +314,35 @@ exports.fetchSMS = async (req, res) => {
     }
 }
 
-exports.getTransactionFromSMS = async (req, res) => {
-    var deviceId = req.params.deviceId;
-    var dronaData = await customerSMS.findOne({deviceId: deviceId});
-    var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
-    var statement = [];
-    for (const bank of banks) {
-        if(typeof bank.repeating_debits === 'undefined')
-            bank.repeating_debits = {};
-        if(typeof bank.repeating_credits === 'undefined')
-            bank.repeating_credits = {};
-    }
-    res.json({
-        status: true,
-        data: banks
-    })
+function getTransactionFromSMS(deviceId){
+    return new Promise(async function(resolve, reject){
+        var htmlTemp = fs.readFileSync('./views/template.html', 'utf8');
+        var dronaData = await customerSMS.findOne({deviceId: deviceId});
+        var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
+        var loans = dronaData.dronaData[0].sms_profile.loans;
+        var bounces = dronaData.dronaData[0].sms_profile.bounces_charges;
+        var salaries = dronaData.dronaData[0].sms_profile.salary;
+        var overdues = dronaData.dronaData[0].sms_profile.overdue;
+        for (const bank of banks) {
+            if(typeof bank.repeating_debits === 'undefined')
+                bank.repeating_debits = {};
+            if(typeof bank.repeating_credits === 'undefined')
+                bank.repeating_credits = {};
+        }
+        var options = {
+            format: "A4",
+            orientation: "portrait",
+            border: "20mm"
+        };
+        var document = {
+            type: 'buffer',
+            template: htmlTemp,
+            context: {
+            data: {banks, loans, bounces, overdues, salaries}
+            }
+        };
+        var buffer = await pdf.create(document, options);
+        var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
+        resolve(filename);
+    });
 }

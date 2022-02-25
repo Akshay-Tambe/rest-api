@@ -17,5 +17,12 @@ module.exports = {
             refresh_token: process.env.ZOHO_REFRESH_TOKEN,
             access_token: process.env.ZOHO_ACCESS_TOKEN
         }
+    },
+    aws: {
+        s3: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+        },
+        bucket: process.env.S3_BUCKET
     }
 }

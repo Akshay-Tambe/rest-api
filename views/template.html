@@ -1,215 +1,167 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="font-size: 12px; font-family: 'Roboto', sans-serif; background-color: white;">
+    {{#each data.banks}}
+        <table style="width: 100%;">
+            <tr style="background-color: #999;">
+                <td style="padding: 7px;"><b>Bank Name: {{bank}}</b></td>
+                <td style="padding: 7px;"><b>Bank Account Number: {{account}}</b></td>
+                <td style="padding: 7px;"><b>No. of Transactions: {{transactions}}</b></td>
+                <td style="padding: 7px;"><b>Total Credits: {{credits}}</b></td>
+                <td style="padding: 7px;"><b>Total Debits: {{debits}}</b></td>
+            </tr>
+            <tr>
+                <td colspan="5" style="padding: 7px; background-color: #999;">
+                    <b>Average Balance</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 7px; border: 1px solid #999;">Month</td>
+                <td colspan="3" style="padding: 7px; border: 1px solid #999;" colspan="2">Amount</td>
+            </tr>
+            {{#each avg_balances}}
+            <tr>
+                <td style="padding: 7px; border: 1px solid #999;" colspan="2">{{@key}}</td>
+                <td style="padding: 7px; border: 1px solid #999;" colspan="3">{{.}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td colspan="5" style="padding: 7px; background-color: #999;">
+                    <b>Repeating Credit</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 7px; border: 1px solid #999;">Month</td>
+                <td colspan="3" style="padding: 7px; border: 1px solid #999;" colspan="2">Amount</td>
+            </tr>
+            {{#each repeating_credits}}
+            <tr>
+                <td colspan="2" style="padding: 7px; border: 1px solid #999;">{{@key}}</td>
+                <td colspan="3" style="padding: 7px; border: 1px solid #999;">
+                    {{#each .}}
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="padding: 7px; border: 1px solid #999;">
+                                    {{amount}}
+                                </td>
+                                <td style="padding: 7px; border: 1px solid #999;">
+                                    {{info}}
+                                </td>
+                            </tr>
+                        </table>
+                    {{/each}}
+                </td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td colspan="5" style="padding: 7px; background-color: #999;">
+                    <b>Repeating Debit</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 7px; border: 1px solid #999;">Month</td>
+                <td colspan="3" style="padding: 7px; border: 1px solid #999;">Amount</td>
+            </tr>
+            {{#each repeating_debits}}
+            <tr>
+                <td colspan="2" style="padding: 7px; border: 1px solid #999;">{{@key}}</td>
+                <td colspan="3" style="padding: 7px; border: 1px solid #999;">
+                    {{#each .}}
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="padding: 7px; border: 1px solid #999;">
+                                    {{amount}}
+                                </td>
+                                <td style="padding: 7px; border: 1px solid #999;">
+                                    {{info}}
+                                </td>
+                            </tr>
+                        </table>
+                    {{/each}}
+                </td>
+            </tr>
+            {{/each}}
+        </table>
+    {{/each}}
 
-    <!-- Bootstrap CSS -->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
-    <style>
-        body{
-            font-size: 12px;
-        }
-        table tr td{
-            border:1px solid #000;
-        }
-        @page {
-        	/*header: page-header;*/
-        	footer: page-footer;
-        }
-    </style>
-    <title>Loan Agreement</title>
-  </head>
-  <body>
-    <div id="pageFooter">
-        <b>Digitally signed by:</b> {{data.cutsomerName}} - {{data.deviceId}} - {{data.ip}} - {{data.currentTime}}
-    </div>
-    <div class="container">
-        <div>
-            <h1>Harvinder Finance Pvt Ltd</h1>
-        </div>
-        <h3>Mediclaim Loan Agreement</h3>
-        <p>
-            This Personal Loan Agreement (‘Agreement’) is made at the place and on the date as set out in Schedule I
-BETWEEN </p>
-<p>APOLLO FINVEST (INDIA) LIMITED, a company incorporated under the provisions of the Companies Act, 1956, having its registered office at Unit No. 803, Blue Moon, 8th Floor, Veera Industrial Estate, New Link Road, Opp. Laxmi Industrial Est, Mumbai, Maharashtra - 400053 as mentioned in Schedule I (‘AFIL’ or the ‘Lender’, which expression shall, unless repugnant to the context, include its successors and assigns) of the First Part; 
-        </p>
-        <p>AND</p>
-<p>The Borrower, material particulars whereof are described and set out in Schedule I, of the OTHER PART.
-The Lender and Borrower are hereinafter collectively referred to as ‘Parties’ and individually as ‘Party’.
-</p>
-    <p>WHEREAS:</p>
-    <p>A. The Lender is a non-banking finance company, inter alia, engaged in the business of providing loans/credit facilities to various customers.</p>
-    <p>B. The Borrower has requested the Lender to grant the Loan to the Borrower and the Lender, relying upon the representations made and information provided by the Borrower, has agreed to grant the Loan to the Borrower, on the terms and conditions mutually agreed and contained in this Agreement and in other Loan Documents, upto the maximum principal amount as mentioned in Schedule I, and for the purpose as mentioned in the Application Form, in its sole and absolute discretion.</p>
-    <p>NOW, THEREFORE, in consideration of the foregoing and other good and valid consideration, the receipt and adequacy of which is expressly acknowledged, the Parties hereby agree as follows</p>
-    <h6>1. DEFINITIONS AND INTERPRETATIONS</h6>
-    <p><b>i. Definitions</b></p>
-    <p>For the purposes of this Agreement, in addition to the terms defined in the description of the Parties: (a) all capitalised words and expressions defined by inclusion in quotation and/or parenthesis anywhere in this Agreement, have the same meanings as ascribed to such words and expressions; (b) words and expressions used herein but not defined shall have the same meaning as assigned to them in General Clauses Act, 1897; and (c) following words and expressions shall have the meaning as set-out in this Clause 1:</p>
-    <p>‘Agreement’ means and includes this Agreement, together with all the schedules, exhibits, attachments and appendices annexed hereto and all amendments/supplements hereto and restatements hereof;</p>
-    <p>‘Applicable Law’ means the ‘Indian Law’ as per the General Clauses Act, 1897;
-‘Application Form’ means the Loan application, in the form and manner prescribed and acceptable to the Lender together with such documents and information as may be required by the Lender, filled in and submitted by the Borrower to the Lender in relation to the Loan;
-</p>
-    <p>‘Bounce Charges’ means an amount payable by the Borrower to the Lender as a penalty where PDCs issued by the Borrower is not honoured by the bank, or NACH or any other Repayment Mode is returned or not honoured; 
-‘Business Day’ means a day on which the Lender and banks are open for business in Delhi, Pune and Mumbai and location of the drawee bank on which the Repayment Mode is drawn;
-</p>
-    <p>‘Due Date’, means, in respect of:</p>
-    <p>a) the EMI and/or Outstanding Dues, the respective EMI Due Date;</p>
-    <p>b) the interest Due, the EMI Due Date;</p>
-    <p>c) costs, charges and expenses incurred or paid by the Lender under the Loan Documents, within seven (7) Business Days from the date on which the Borrower has received notice from the Lender providing details of such costs, charges and expenses; and</p>
-    <p>d) any other amount payable under the Loan Documents, the date on which such amount falls due in terms of the Loan Documents, or on demand if the due date is not specified in such Loan Document.</p>
-    <p>‘NACH’ or ‘National Automated Clearing House’ means the debit clearing schemes, notified by Reserve Bank of India from time to time, being mode(s) of electronic funds transfer from one bank account to another bank account using the services of a clearing house or any other platform or mechanism duly authorised in this regard including without limitation the National Electronic Clearing Service;</p>
-    <p>‘Rate of Interest’ means the rate of interest in relation to the Loan as mentioned in Schedule II.
-‘Loan’ means:
-</p>
-    <p>(i) the personal loan provided by the Lender to the Borrower upto a maximum principal amount as mentioned in Schedule I and such loan may include:</p>
-    <p>‘Loan Documents’ means collectively:</p>
-    <p>A. Application Form; B. this Agreement; C. any other document executed from time to time pursuant to any of the foregoing to which the Borrower or the Lender is a party; and D. any other agreement or document which the Lender designates as a Loan Document</p>
-<p>‘Loan Tenor’ shall mean the tenor of the Loan as specified in Schedule II.</p>
-<p>‘EMI Amount’ means the amount payable every month by the Borrower to the Lender comprising of the interest, or as the case may be, principal amount of the Loan and/or interest;</p>
-<p>‘NEFT’ means the National Electronic Fund Transfer in terms of the regulations and directions issued by RBI or any regulatory or statutory body;</p>
-<p>‘Outstanding Dues’ means, at any time, all the amounts outstanding and payable or obligations to be performed by the Borrower to the Lender, pursuant to the terms of this Agreement and/or any other Loan Documents, including but not limited to the following:</p>
-<p>(a) the principal amount(s) of the Loan; (b) the interest on the Loan; (c) all other obligations and liabilities of the Borrower, indemnities, liquidated damages, costs, charges, expenses and other fees and interest incurred under, arising out of or in connection with this Agreement and/or any other Loan Documents (either severally or jointly); and (d) any and all expenses or sum incurred by the Lender for the enforcement of and collection of any amounts due under this Agreement and/or any other Loan Documents, including expenses of enforcement and realisation;</p>
-<p>‘Outstation Collection Charges’ means an amount payable by the Borrower to the Lender as a fee for outstation PDCs submitted by the Borrower, details of which are provided in Schedule I;</p>
-<p>‘Merchant’ means a person who buys and sells commodities for profit, can be dealer, trader, store keeper, retailer;</p> 
-<p>‘Outstation Collection Charges’ means an amount payable by the Borrower to the Lender as a fee for outstation PDCs submitted by the Borrower, details of which are provided in Schedule I;</p>
-<p>‘PDC’ shall mean post-dated cheque(s) drawn in favour of the Lender for an amount equivalent to the Loan availed, from time to time;</p>
-<p>‘PDC Swap Charges’ means an amount payable by the Borrower to the Lender for replacement or exchange of PDCs submitted by the Borrower with the Lender, details of which are provided in Schedule II;</p>
-<p>‘Penal Interest’ means an additional interest payable by the Borrower to the Lender as a penalty in case of delay in payment of the EMI amount and/or Outstanding Dues, at the rate as mentioned in Schedule I;</p>
-<p>‘Pre-payment Charges’ means an amount payable by the Borrower to the Lender as a penalty for repayment of the Outstanding Dues, either in part or whole, before its scheduled EMI Due Date, details of which are provided in Schedule III;</p>
-<p>‘EMI Due Date’:</p>
-<p>(a) in relation to the EMI amount, means the date, on or before which each EMI is to be repaid by the Borrower, as more specifically mentioned in Schedule II; and</p>
-<p>(b) in relation to the Outstanding Dues means the date, on or before which, the entire Outstanding Dues is to be repaid by the Borrower, as more specifically mentioned in Schedule II;</p>
-<p>‘Repayment Modes’ means the payment of the EMI amount and the Outstanding Dues, as the case may be, on or before the Due Dates(s), by any of the following modes for EMI amount -</p>
-<p>(a)	NACH</p>
-<p>And by any of the following modes for the outstanding dues - </p>
-<p>(a) NACH; (b) NEFT; (c) PDCs; (d) RTGS; (e) Standing instructions at the bank; and (f) Any other instrument suitable from time to time.</p>
-<p>‘RBI’ means the Reserve Bank of India;</p>
-<p>‘RTGS’ shall mean real time gross settlement in terms of the regulations and directions issued by RBI or any regulatory or statutory body;</p>
-<p>‘Website’ means the website of the Lender, presently being www.apollofinvest.com</p>
-<p>ii.	Interpretation</p>
-<p>a)	Unless the context otherwise requires, words denoting the singular shall include the plural and vice versa;</p>
-<p>b)	the table of contents, headings and the use of bold typeface, are inserted for ease of reference and shall be ignored in the construction and interpretation of the Agreement;</p>
-<p>c)	a reference to a Clause or Schedule is, unless indicated to the contrary, a reference to a Clause or Schedule to this Agreement;</p>
-<p>d)	references to this Agreement shall be construed as references also to any separate or independent stipulation or agreement contained in it;</p>
-<p>e)	references to the word ‘includes’ or ‘including’ shall be construed without limitation; and</p>
-<p>f)	words importing a particular gender include all genders.</p>
-<p>2.	LOAN</p>
-<p>i.	The Borrower agrees to borrow from the Lender and the Lender agrees to make available and extend to the Borrower, at its sole and absolute discretion, the Loan, for an amount as mentioned in the Application Form and Schedule I, for the purpose as mentioned in the Application Form, on the terms and conditions contained in this Agreement and in other Loan Documents.</p>
-<p>ii.	The disbursement of the Loan may be made directly to the Borrower or Merchant in one lump sum or in such Instalments as per the details provided under the Application Form and Schedule I, subject to the terms and conditions contained herein.</p>
-<p>iii.	The disbursement of the Loan shall be made in accordance with the RTGS business hours as notified by the RBI from time to time. The Lender shall not in any event or circumstance be liable or be construed as being liable in case there is any delay(s) in disbursement of the Loan on account of any technical or system errors, etc.</p>
-<p>iv.	The Borrower shall pay interest on the Loan on the EMI Due Date at the applicable Rate of Interest. Subject to the commencement of EMI Due Date with respect to the Loan, all interest accruing under the Loan shall accrue from day to day and shall be calculated on a FLAT RATE by taking a base of 365 days per year.</p>
-<p>v.	The Borrower agrees to repay the EMI Amount and the Outstanding Dues to the Lender on or before the EMI Due Date, or in such manner and at such place, as may be agreed between the Borrower and Lender. The instructions for the NACH as provided by the Borrower will cover the maximum principal amount under the Loan and other Outstanding Dues thereon. </p>
-<p>vi.	The EMI Amount shall automatically change by reason of change in any rates, taxes, charges, imposts, levies and monies whatsoever that are or may be levied on the EMI Amount or the transaction contemplated hereunder or may become payable by the Borrower by virtue of this Agreement. Such change in the EMI Amount due to change in the rates, taxes, charges, imposts, levies and monies as stated above shall be effected only prospectively and the same shall automatically form part of the Loan.</p>
-<p>vii.	At the written request of the Borrower, the Lender may foreclose the Loan by accepting the pre-payment of the Outstanding Dues (‘Pre-Payment’). The Pre-Payment of the Outstanding Dues may be either full Pre-Payment or part Pre-Payment as described below.</p>
-<p>a)	Full Pre-Payment - At the request of the Borrower, the Lender may accept the full Pre-Payment of the Outstanding Dues and foreclose the Loan with prepayment charge of 5%.</p>
-<p>b)	Part Pre-Payment – Part payment is not acceptable as this is bullet payment loan where customer have to pay full amount in one instalment only.</p>
-<p>viii.	The Borrower acknowledges that any Pre-Payment shall be subject to the payment of the Pre-Payment Charges as specified under Schedule II. The Lender shall be entitled to recover from the Borrower the Pre-Payment Charges on the amount of the Loan, repaid by the Borrower ahead of the timeline as mentioned in Schedule III.</p>
-<p>ix.	The Borrower undertakes to deliver to the Lender, the PDCs as specified under . The Borrower confirms that PDCs are issued towards repayment of the EMI Amount and the Outstanding Dues, and the delivery of PDCs shall be deemed to be an unconditional and irrevocable authority given by the Borrower to the Lender to present PDCs towards repayment of the EMI Amount and the Outstanding Dues. The Borrower confirms that PDCs shall be honoured on its first presentation and the Borrower shall not issue any contrary instructions to the relevant bank. The Borrower confirms that PDC is not a security. The Lender shall be entitled to recover from the Borrower PDC Swap Charges and the Outstation Collection Charges.</p>
-<p>x.	Any dispute or difference of any nature whatsoever shall not entitle the Borrower to withhold or delay payment of any EMI Amount or other sum and the Lender shall be entitled to present the PDCs/NACH to the bank of the Borrower on the Due Dates.</p>
-<p>xi.	The Borrower hereby irrevocably authorises the Lender to destroy PDC(s) (if any) in the possession of the Lender upon repayment of the Loan together with all costs, charges and expenses, by the Borrower to the satisfaction of the Lender.</p>
-<p>xii.	Notwithstanding anything contained herein, the Lender shall be entitled to adjust any advance EMI and/or security deposit/initial payment made by the Borrower towards any Outstanding Dues in such manner and at such time as the Lender may determine in its sole discretion.</p>
-<p>xiii.	All sums payable by the Borrower to the Lender shall be paid without any deductions whatsoever at such place as the Lender may specify and shall be so paid so as to enable the Lender to realise the sum on or before the Due Date. Credits/discharge for payments will be given only on realisation of amounts due.</p>
-<p>xiv.	In the event of the Borrower committing a default in the payment of any sum payable hereunder and/or in relation to the Loan or the Borrower committing any breach or default of any other condition of this Agreement or under any other instrument in respect of the Loan, the Borrower shall, in respect of the Outstanding Dues and in respect of the EMI Amount or other amount in default, pay the Penal Interest, from the date of default till the date of realisation by the Lender. The payment of the Penal Interest shall not absolve the Borrower of the other obligations in respect of such breach or default or affect the rights of the Lender in respect of the breach or default.</p>
-<p>xv.	Any sums received by the Lender from the Borrower shall be appropriated in the following manner:</p>
-<p>a)	firstly against interest payment;</p>
-<p>b)	secondly against principal amount of the Loan;</p>
-<p>c)	thirdly against overdue EMI amount;</p>
-<p>d)	fourthly against Bounce Charges; and</p>
-<p>e)	lastly against any other penal charges or any other claim of the Lender on the Borrower under the Loan Documents.</p>
-<p>xvi.	Notwithstanding anything stated elsewhere in this Agreement, the continuation of the Loan shall be at sole and absolute discretion of the Lender and the Borrower(s) outstanding shall be payable to the Lender on demand. The Parties agree that the Lender may at any time in its sole discretion and without assigning any reason call upon the Borrower(s) to pay the Borrower(s) outstanding and thereupon the Borrower(s) shall, within forty eight (48) hours of being so called upon, pay the whole of the Borrower(s) outstanding to the Lender without any delay or demur.</p>
-<p>3.	DEFAULT</p>
-<p>The Borrower shall be deemed to have committed an act of default if the Borrower(s) does not comply with his/her obligations as mentioned in this Agreement or any Loan Document, and also on the happening of any one or more of the following events, (each an ‘Event of Default’ and collectively ‘Events of Default’):</p>
-<p>a)	The Borrower fails to pay any EMI Amount or the Outstanding Dues under this Agreement on or before the Due Date; </p>
-<p>b)	The Borrower commits breach of any of the terms, representations, covenants or conditions contained in this Agreement or the Loan Document;</p>
-<p>c)	it is found that the Borrower commits a default of any of the terms and conditions in respect of any other loan or facility provided by the Lender and/or any affiliates of the Lender;</p>
-<p>d)	there exists any circumstances which in the opinion of the Lender prejudicially affects or may affect the Lender’s interest or the Borrower’s ability to repay the Loan;</p>
-<p>e)	demise of the Borrower or if the Borrower compounds with his/her creditors or permits any attachment or sequestrations or other processes against any of his/her assets or properties;</p>
-<p>f)	if the Borrower commits an act of insolvency or if the Borrower is declared insolvent or bankrupt or if a receiver or official assignee is appointed in respect of any property or estate of the Borrower or if the Borrower asks for any application for declaring himself an insolvent or if an application for declaring the Borrower as insolvent is made or any order is passed by any competent count or authority for taking the Borrower into insolvency; and</p>
-<p>g)	if any proceedings are pending or threatened against the Borrower by any government agency or authority for any misconduct or breach/violation of any law or regulations or code of conduct, etc.;</p>
-<p>h)	any other events, conditions or circumstances which occur or exist which have or could have a material adverse effect on the business of the Lender. </p>
-<p>Any Event of Default shall be considered a material breach of this Agreement and upon the occurrence of the Event of Default and at any time thereafter, if any such event shall be continuing, the Lender may, in its sole discretion and upon written notification:</p>
-<p>a)	accelerate the repayment of the Loan including the Outstanding Dues; </p>
-<p>b)	place the Loan on demand or declare all the Outstanding Dues payable by the Borrower in respect of the Loan to be due and payable immediately;</p>
-<p>c)	recover the charges for dishonour of the Repayment Modes, Penal Interest and any other penal charges from the Borrower as mentioned in Schedule II;</p>
-<p>d)	terminate this Agreement;</p>
-<p>e)	exercise such other rights and remedies as may be available to the Lender under Applicable Law during the pendency of the Loan including without limitation under Section 138 of the Negotiable Instruments Act, 1881 and under Section 25 (1) of Payment of Settlement System Act, 2007; and/or</p>
-<p>f)	stipulate such other condition(s) or take such other action(s) as the Lender deems fit.</p>
-<p>4.	COVENANT OF THE BORROWER</p>
-<p>The Borrower hereby covenants that during the period of this Agreement:</p>
-<p>i.	The Borrower shall utilize the Loan only for the Purpose specified under the Application Form.</p>
-<p>ii.	The Borrower shall observe and perform all its obligations and covenants under this Agreement and any Loan Document.</p>
-<p>iii.	The Borrower shall ensure timely payment of the EMI amount to the Lender and ensure that the Repayment Modes issued towards payment of the EMI Amount are honoured on presentation. It is the duty of the Borrower to ensure that his/her bank account has been debited towards the EMI Amount and in case of his/her account not been so debited, the Borrower shall be obliged to inform the Lender in this regard within 3 (three) Business Days from the Due Date of such EMI. </p>
-<p>iv.	The Borrower shall promptly notify the Lender of any change in the Borrower’s address, phone number, employer name, email address, as mentioned in Schedule I.</p>
-<p>v.	The Borrower confirms that he/she shall ensure availability of funds in the bank account on which such PDCs and NACH mandates have been drawn and that the Borrower will not at any time close his/her bank account until the full and final payment of the Outstanding Dues has been made to the Lender by the Borrower.</p>
-<p>vi.	The Borrower shall not change his/her name or change his/her bank account on which PDCs and NACH mandates have been drawn without prior written consent of the Lender.</p>
-<p>vii.	The Borrower shall pay/reimburse the Lender against all expenses for any purpose relating to this Agreement or any Loan Document including any taxes pertaining to this Agreement, or the Loan and enforcing the terms thereof.</p>
-<p>viii.	The Borrower shall pay and bear all taxes, rates, duties, charges and other imposts and obligations, existing as well as in future, in respect of the product and the transaction hereunder.</p>
-<p>ix.	The Borrower shall do all such things and execute all such writings as the Lender may require from time to time for duly or more perfectly securing the repayment of the Loan.</p>
-<p>x.	The Borrower shall ensure that the obligations under the Loan Documents shall at least rank pari passu with all its unsecured and unsubordinated obligations.</p>
-<p>xi.	The Borrower shall promptly notify the Lender of an Event of Default upon occurrence of the same. </p>
-<p>xii.	Each of the Borrowers represent(s) and warrant(s) that (which shall be deemed to have been repeated to the Lender on the date of the disbursement and on each date thereafter till entire repayment and in reliance of which the Lender has granted the Loan): (a) The Borrower is a citizen of India and a major (in terms of age) and is of sound mind and is competent to contract and enter into and perform his /her obligations contemplated under this document/ other document/in respect of the Loan; (b) There is no impediment or restriction, whether under law, judgement, order, award, contract or otherwise, for any of the Borrowers entering into and/or performing any of the transactions contemplated by this/other documents/ in respect of the Loan and all approvals and consents, wherever necessary have been duly obtained and are and will continue to be in full force; (c) The execution hereof constitutes legal, valid and binding obligations of the Borrower; (d) That there is no Event of Default existing; (e) All information and documents provided by the Borrower or on behalf of the Borrower are true, correct and up-to-date and and nothing has occurred since the date of communication or supply of any information to the Lender which renders such information untrue or misleading in any respect; and (f) the declarations made by Borrower under this Agreement and the Loan Documents are true and complete and no information has been suppressed / withheld and (g) Except to the extent disclosed to the Lender, no litigation, arbitration, administrative or other proceedings are pending or threatened against the Borrower or its assets, which, if adversely determined, might have a material adverse effect; and (h) the Borrower has not been declared to be a wilful defaulter or a non-cooperative borrower by any other regulated entity.</p>
-<p>5.	GENERAL TERMS</p>
-<p>i.	Any statement of account furnished by the Lender regarding the Outstanding Dues payable by the Borrower under this Agreement shall be accepted by and be binding on the Borrower and shall be a conclusive proof of the correctness of the amount mentioned therein. Without prejudice to the aforementioned, if the Borrower desire to question any statement issued by the Lender or any part thereof, the Borrower shall furnish to the Lender full details of the same within 10 (ten) Business Days from the receipt of the statement by the Borrower and the Lender may consider the same and the Borrower shall not be entitled to object to the same thereafter on any ground whatsoever. It is however agreed between the Parties that notwithstanding the foregoing, the Borrower shall not be entitled to default or delay the payment of EMI Amount on the ground of the statement of account furnished by the Lender being inaccurate or any other ground whatsoever.</p>
-<p>ii.	Wherever the Borrower has given Promissory Note(s) to the Lender for the amount of the Loan, in case of an Event of Default, the Borrower will still be liable to repay to the Lender the Loan amount along with the interest at the Rate of Interest hereto from the date of default till actual payment, along with other Outstanding Dues, if any.</p>
-<p>iii.	The Borrower confirms that if a Promissory Note is issued by him/her, the same shall operate as continuing security to the Lender to be enforceable for the repayment of the Outstanding Dues and/or all sums remaining unpaid under the Loan now or hereafter, including all interest to become payable in respect of/under the Loan or which may in future be advanced and that the Borrower will remain liable under/in respect of the Promissory Note notwithstanding payment made into the account of the Loan from time to time or the Loan being reduced or extinguished from time to time or even if the balance in the account of the Loan may be in credit. In case of death of the Borrower, the Promissory note(s) given by the Borrower will be invoked against his/ her legal heir/s, legal representative/s, executor/s, administrator/s and permitted assign/s.</p>
-<p>iv.	Any promotional scheme and/or contest being initiated by the Lender for its customers is independent of this Agreement and the Loan and such promotional schemes and/or contests do not constitute any kind of solicitation by the Lender. Such promotional schemes and/ or contests shall be governed by the terms and conditions in relation thereto, which shall be carefully read by the Borrower in case the Borrower decides to participate in such schemes/contests. Further, the Borrower agrees and confirms that the Lender shall have the right to withdraw any of the promotional schemes at its sole discretion and without notice.</p>
-<p>v.	The Borrower hereby agrees and confirm that the Lender shall have the right to cross sell its other products and services and the products and services of its affiliates, to the Borrower along with the Loan.</p>
-<p>vi.	The Borrower shall pay any and all stamp duty, stamp duty penalties, registration fees and similar taxes and duties which are or may become payable in connection with the entry into, performance or enforcement of this Agreement and/or Loan Documents whether at the time of execution or thereafter. The Borrower hereby agrees that in case the Lender is required to make any payments such as stamp duty, stamp duty penalty, registration charges and/or any other charges and/or duties on and in relation to this Agreement and/ or Loan Documents or any other underlying/associated documents, whether at the time of the execution or thereafter then the Lender shall be entitled/authorised to recover the same from the Borrower.</p>
-<p>vii.	Any provision of this Agreement which is prohibited or unenforceable including without limitation due to any notification, guidelines, circular issued by RBI from time to time, in any jurisdiction shall, as to such jurisdiction, be ineffective only to the extent of such prohibition or un-enforceability but that shall not invalidate or affect the remaining provisions of this Agreement nor affect such provision in any other jurisdiction.</p>
-<p>viii.	The liabilities of the Borrower and the Co-Borrowers, if any, under this Agreement shall be joint and several.</p>
-<p>ix.	Any delay in exercising or omission to exercise any right, power or remedy accruing to the Lender under this Agreement or any other agreement or Loan Document shall not impair any such right, power or remedy and shall not be construed to be waiver thereof or any acquiescence in any default, nor shall the action or inaction of the Lender in respect of any default or any acquiescence by it in any default affect or impair any right, power or remedy of the Lender in respect of any other default.</p>
-<p>x.	Any notice to be given to the Borrower in respect of this Agreement shall be deemed to have been validly given if served on the Borrower or sent by courier or left at the address of the Borrower stated in Schedule I hereto or at the Borrower’s existing or last known business or private address. Any such notice sent by courier shall be deemed to have been received by the Borrower within 48 (forty eight) hours from the time of its posting.</p>
-<p>xi.	Without prejudice to all other rights as the Lender or any of the third parties appointed by the Lender may have under this Agreement and under law, on the occurrence of an Event of Default, the Lender, its authorised representatives, agents, and third parties as appointed by the Lender are authorised to use the contact details provided by the Borrower to get in touch with the Borrower (including the authorised signatory(ies)/representative(s), guarantor(s) (if any) and third parties including the family members of the Borrower) whose information the Borrower has provided to the Lender. Also, the Borrower may be sent reminders from time to time for settlement of any Outstanding Dues by post, fax, telephone, email, SMS text messaging via mobile phone.</p>
-<p>xii.	Upon the occurrence and continuation of an Event of Default, the Lender is authorised at any time, without presentment, demand, protest or other notice of any kind to the Borrower, any such notice being expressly waived, to set off and to appropriate and apply any and all monies lying or deposited or held by the Lender. </p>
-<p>xiii.	The Borrower agrees, declares and confirms that, notwithstanding any of the provisions of the Indian Contract Act, 1872 or Applicable Law, or any terms and conditions to the contrary contained in this Agreement, the Lender may, at its absolute discretion, appropriate any payments made by the Borrower under this Agreement or any amounts realised by the Lender by enforcement of security or otherwise, towards the dues payable by the Borrower to the Lender under this Agreement and/or other agreements entered into between the Borrower and the Lender and in any manner whatsoever.</p>
-<p>xiv.	The Lender shall be entitled at the sole risk and cost of the Borrower to engage one or more person(s) to collect the Borrower’s dues and shall further be entitled to share such information, facts and figures pertaining to the Borrower as the Lender deems fit. The Lender may also delegate to such person(s) the right and authority to perform and execute all such acts, deeds, matters and things connected herewith, or incidental thereto, as the Lender may deem fit. The Borrower recognizes, accepts and consents to such delegation.</p>
-<p>xv.	The Borrower acknowledges that the Lender has or may have business and other transactions with third parties (including those who are in the business of manufacturing, supplying or otherwise dealing with any asset being financed by the proceeds of this Loan) and hereby waives any conflict of interest that it may have on such arrangement.</p>
-<p>xvi.	The Borrower shall not: i) use the fund for purchase of gold in any form,(including primary gold, gold bullion, gold jewellery, gold coins, units of gold exchange traded funds (ETF) and units of gold mutual funds); and ii) directly or indirectly, make or offer any payment, gift or other advantage which is intended to, or does influence or reward any person (whether or not they are in the public sector) for acting in breach of an expectation of good faith, impartiality or trust or otherwise performing their function improperly.</p>
-<p>xvii.	The Borrower further acknowledges, understands and agrees that the Lender has adopted risk based pricing, which is arrived by taking into account, broad parameters like the customers financial and credit profile. Applicable interest rates are arrived at taking into account the prevailing market rates at the time of sanctioning. Accordingly, the rate of interest may change from time to time as may be intimated by the Lender. The details are also available on our website: www.apollofinvest.com.</p>
-<p>6.	ASSIGNMENT OF RIGHTS</p>
-<p>The Lender shall at any time, without any consent of or notice to the Borrower be entitled to securitise, sell, assign, discount or transfer all or any part of the Lender’s right and obligations under this Agreement or other Loan Documents, to any person(s) and in such manner and on such terms as the Lender may decide. The Borrower shall not be entitled to directly or indirectly assign or in any manner transfer, whether in whole or part, any rights or obligation under this Agreement and other Loan Documents.</p>
-<p>7.	DISCLOSURE</p>
-<p>i.	The Borrower agrees and understands that as a pre-condition relating to the grant of the Loan to the Borrower, the Lender requires the Borrower’s consent for the disclosure by the Lender of information and data relating to the Borrower, of the Loan availed of/ to be availed by the Borrower, obligations assured/ to be assured by the Borrower in relation thereto, default, if any, committed by the Borrower in discharge thereof and any other information made available by the Borrower to the Lender.</p>
-<p>ii.	Accordingly, the Borrower agrees and gives consent for the disclosure by the Lender, of all or any such:</p>
-<p>a)	information and data relating to the Borrower;</p>
-<p>b)	the information or data relating to Loan availed of/to be availed by the Borrower; and</p>
-<p>c)	default, if any, committed by the Borrower in discharge of such obligation as the Lender may deem appropriate and necessary to disclose and furnish to Credit Information Bureau of India Limited (‘CIBIL’) and any other agency authorised in this behalf by RBI.</p>
-<p>iii.	The Borrower further declares that the information and data furnished by the Borrower to the Lender is true and correct.</p>
-<p>iv.	The Lender shall have an unqualified right to disclose the name of the Borrower to RBI, CIBIL and any other agency authorised in this behalf by RBI. The Borrower gives its consent to the Lender and/or RBI and/ or CIBIL to publish their name as defaulters in such manner and through such medium as the Lender/RBI and/or CIBIL in their absolute discretion may think fit.</p>
-<p>v.	The aforesaid right shall be available to the Lender in addition to and not in derogation of any other rights available under the Agreement.</p>
-<p>vi.	Borrower further agrees and understands that:</p>
-<p>a)	CIBIL and any other agency so authorized may use and/or process the said information and data disclosed by the Lender in the manner as deemed fit by them; and</p>
-<p>b)	CIBIL and any other agency so authorised may furnish for consideration the processed information and data or products thereof prepared by them, to the Lender/financial institutions and other credit grantors or registered users, as may be specified by RBI in this behalf.</p>
-<p>vii.	The Borrower agrees and understands that the Lender may also disclose any information/documents relating to the Borrower to any third party including Lender’s affiliates for promotional purposes or any other purpose as Lender may deem fit.</p>
-<p>viii.	The Borrower(s) acknowledges the consent given by the Borrower and such third parties (as required) to Lender to obtain Borrower’s KYC and credit related information/documents from third parties including Unique Identification Authority of India, CIBIL and other entities and also further consents that Lender may, by its self or through authorized persons, verify any information given, check credit references, employment details and obtain KYC related documents or credit reports to determine genuineness of the Borrower and/or creditworthiness from time to time. The Borrower further acknowledges the consent to Unique Identification Authority of India or such any other such third party consenting to sharing of information with respect to the Borrower with the Lender.</p>
-<p>8.	INDEMNITY</p>
-<p>i.	The Borrower shall indemnify the Lender (and its Affiliates) at all times hereafter from and against any and all claims, damages, costs, losses, expenses, suits, proceedings, actions, liabilities, etc., that may have been suffered by the Lender and/or its Affiliates by reason of any act by the Borrower or default on the part of the Borrower under this Agreement/in respect of the Loan and/or for the recovery of the Outstanding Dues (including legal/attorney fee).</p>
-<p>ii.	The Borrower further agrees to indemnify and keep indemnified the Lender and/or its Affiliates from time to time and at all times hereafter and against any and all claims, duties, damages, costs, losses expenses, suits, proceedings, actions, liabilities etc., for/under which the Lender and/or its Affiliates may be liable:</p>
-<p>a)	on account of destruction of PDCs of the Borrower in accordance with Clause 2.14; and</p>
-<p>b)	at any point of time whether at the time of execution of this Agreement or any time thereafter.</p>
-<p>iii.	The Borrower further agrees to indemnify and keep indemnified the Lender and/or its Affiliates from time to time and at all times hereafter from and against any and all claims, damages, costs, losses, expenses, suits, proceedings, actions, liabilities, etc., whatsoever arising in connection with or relating to any Communications (as defined below) provided/received by the Lender and/or its Affiliates by Electronic Media (as defined below).</p>
-<p>9.	ELECTRONIC MEDIA</p>
-<p>i.	The Borrower is aware that transmission of this Agreement, terms and conditions, instructions, acceptances and communications (‘Communications’) through electronic means such as email, facsimile, SMS text messaging, websites, online acceptance, etc. (‘Electronic Media’) involves a number of risks including fraudulent alterations and incorrect transmissions and absence of confidentiality. However, the Borrower is desirous of receiving Communications from and providing Communications to the Lender through the Electronic Media for various matters under this Agreement including in relation to the Loan and the operation thereof.</p>
-<p>ii.	In consideration of the Lender permitting the same, the Borrower hereby irrevocably, confirms and undertakes to the Lender as under:</p>
-<p>a)	The Lender shall be entitled (without being bound to do so) to rely upon the Communications provided through the Electronic Media (and believe the same to be genuine), for their requirements. In case of any question as to what were the Communications provided or received, the records of the Electronic Media received by the Lender shall be treated as final, conclusive and binding.</p>
-<p>b)	The Borrower has ensured and shall ensure that the Communications provided through the Electronic Media to the Lender are provided by the Borrower and hereby agrees and confirms that the Lender shall not be responsible for conducting any verification whatsoever in this regard.</p>
-<p>c)	The Borrower confirms that the Lender shall not be bound to act in accordance with whole or any part of the communications as it may appear in the Communications so conveyed and the same shall be at the sole risk of the Borrower.</p>
-<p>d)	The Lender shall not be liable for the consequences of any act or any refusal or omission to act or deferment of action by the Lender on basis of the Communications through the Electronic Media.</p>
-<p>e)	The Lender shall not be required to await receipt of the Communications in writing before taking any action in connection with the Communications provided through any Electronic Media and the non-delivery and non-conformity of such Communications in writing shall not in any manner prejudice the Lender’s rights under this Agreement or otherwise.</p>
-<p>f)	The Lender may at any time whatsoever without assigning any reason withdraw or modify or add the facility/ies provided to the Borrower in relation to the Communications through Electronic Media.</p>
-<p>g)	The Borrower is aware and confirms that the Lender is agreeing to act on any Communications provided through Electronic Media only by reason of, and relying upon the undertaking and indemnities contained in this Clause.</p>
-<p>10.	DISPUTE RESOLUTION</p>
-<p>Any dispute arising out of or in relation to the Loan, including this Agreement and/or Loan Documents shall be referred for arbitration to the sole arbitrator appointed by the Lender. The Parties agree and confirm that the arbitration proceedings shall be conducted in in accordance with the Arbitration and Conciliation Act, 1996 and the rules applicable thereto. The venue of the arbitration shall be at Mumbai, at the sole discretion of the Lender and the arbitration proceeding shall be conducted in English language. The decision of the Arbitrator shall be final and binding on the Parties. Pending the passing of final award, the Borrower shall be liable to perform all its obligations under this Agreement.</p>
-<p>11.	GOVERNING LAW</p>
-<p>The validity, interpretation, implementation and resolution of disputes arising out of or in connection with this Agreement shall be governed by Indian law. The Parties agree that all matters arising out of this Agreement shall be subject to the exclusive jurisdiction of the courts or tribunals (as the case may be) at Mumbai, India.</p>
+    <br><br><br>
+    <table style="width: 100%;">
+        <tr>
+            <td colspan="2" style="background-color: #999; padding: 7px;"><b>Salary</b></td>
+        </tr>
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Month</b></td>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Amount</b></td>
+        </tr>
+        {{#each data.salaries}}
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;">{{month}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">{{count}}</td>
+        </tr>
+        {{/each}}
+    </table>
+    
+    <table style="width: 100%;">
+        <tr>
+            <td colspan="3" style="background-color: #999; padding: 7px;"><b>Loans</b></td>
+        </tr>
+        {{#each data.loans}}
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;">Loans Ac: {{acct_no}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">Lender: {{lender}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">Loan type: {{loan_type}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;">Month</td>
+            <td style="padding: 7px; border: 1px solid #999;" colspan="2">Amount</td>
+        </tr>
+        {{#each emis}}
+            <tr>
+                <td style="padding: 7px; border: 1px solid #999;">{{as_of}}</td>
+                <td style="padding: 7px; border: 1px solid #999;" colspan="2">{{amount}}</td>
+            </tr>
+        {{/each}}
+        {{/each}}
+    </table>
 
-    </div>
+    <table style="width: 100%;">
+        <tr>
+            <td colspan="2" style="background-color: #999; padding: 7px;"><b>Bounces</b></td>
+        </tr>
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Month</b></td>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Count</b></td>
+        </tr>
+        {{#each data.bounces}}
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;">{{month}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">{{count}}</td>
+        </tr>
+        {{/each}}
+    </table>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </body>
+    <table style="width: 100%;">
+        <tr>
+            <td style="background-color: #999; padding: 7px;" colspan="3"><b>Overdues</b></td>
+        </tr>
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Due date</b></td>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Credit Card last four digits</b></td>
+            <td style="padding: 7px; border: 1px solid #999;"><b>Due Amount</b></td>
+        </tr>
+        {{#each data.overdues}}
+        <tr>
+            <td style="padding: 7px; border: 1px solid #999;">{{due_date}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">{{card}}</td>
+            <td style="padding: 7px; border: 1px solid #999;">{{due_amount}}</td>
+        </tr>
+        {{/each}}
+    </table>
+</body>
 </html>
