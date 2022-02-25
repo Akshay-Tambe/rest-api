@@ -314,8 +314,8 @@ function getTransactionFromSMS(deviceId){
         }
         var options = {
             format: "A4",
-            orientation: "portrait",
-            border: "20mm"
+            orientation: "landscape",
+            border: "10mm"
         };
         var document = {
             type: 'buffer',
