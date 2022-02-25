@@ -28,7 +28,7 @@ function pushToCRM(recordId, data){
             Authorization: `Zoho-oauthtoken ${access_token}`
         }
         var configData = {
-            method: 'get',
+            method: 'put',
             url: url,
             headers: headers,
             data: data
