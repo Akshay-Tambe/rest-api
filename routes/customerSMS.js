@@ -18,8 +18,4 @@ router
 .route('/fetchSMS/:mobile')
   .get(customerSMSController.fetchSMS);
 
-router
-.route('/getTransactionFromSMS/:mobile')
-  .get(customerSMSController.getTransactionFromSMS);
-
 module.exports = router;
