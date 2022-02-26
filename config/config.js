@@ -24,5 +24,10 @@ module.exports = {
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
         },
         bucket: process.env.S3_BUCKET
+    },
+    core: {
+        config: {
+            url: process.env.CORE_URL
+        }
     }
 }
