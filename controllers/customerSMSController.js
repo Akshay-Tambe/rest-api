@@ -327,7 +327,7 @@ function getTransactionFromSMS(deviceId){
         };
         var buffer = await pdf.create(document, options);
         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
-        // await insertStatementCore(dronaData.mobile, filename);
+        await insertStatementCore(dronaData.mobile, filename);
         resolve(filename);
     });
 }
