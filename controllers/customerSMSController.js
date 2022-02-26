@@ -43,8 +43,6 @@ exports.storeSMSCore = async (req, res) => {
             zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
             zip.writeZip(rarFileName);
         
-        
-        
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
             sms.smslog = smslogs;
@@ -329,6 +327,32 @@ function getTransactionFromSMS(deviceId){
         };
         var buffer = await pdf.create(document, options);
         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
+        // await insertStatementCore(dronaData.mobile, filename);
         resolve(filename);
+    });
+}
+
+function insertStatementCore(mobile, filename){
+    return new Promise(async function(resolve, reject){
+        let url = config.core.config.url + "api/customer/drona/data";
+        let data = {
+            mobile: mobile,
+            url: filename
+        }
+        var configData = {
+            method: 'post',
+            url: url,
+            data: data
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            console.log(response.data);
+            resolve(response.data)
+        })
+        .catch(function (error) {
+            console.log(error);
+            reject(error)
+        });
     });
 }
