@@ -33,17 +33,18 @@ exports.storeSMSCore = async (req, res) => {
         smslog: smslog
     }
     try{
-        var jsonFileName = `${Date.now()}_json.json`;
-        var rarFileName = `${Date.now()}_json.zip`;
-        fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
-        
-        var zip = new AdmZip();
-        zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
-        zip.writeZip(rarFileName);
-        
-        
         var mobile = await customerSMS.findOne({mobile: req.body.mobile});
         if(mobile === null){
+            var jsonFileName = `${Date.now()}_json.json`;
+            var rarFileName = `${Date.now()}_json.zip`;
+            fs.writeFileSync(jsonFileName, JSON.stringify(dataToDrona));
+            
+            var zip = new AdmZip();
+            zip.addFile(jsonFileName, fs.readFileSync(jsonFileName),'',0644);
+            zip.writeZip(rarFileName);
+        
+        
+        
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
             sms.smslog = smslogs;
@@ -56,7 +57,7 @@ exports.storeSMSCore = async (req, res) => {
             var checkDevice = await checkDronaDevice(req.body.deviceId);
             if(checkDevice){
                 // registerDeviceDrona(data);
-                pushToDrona(rarFileName, req.body.deviceId);
+                await pushToDrona(rarFileName, req.body.deviceId);
                 fs.unlinkSync(jsonFileName);
                 res.json({
                     status: true,
@@ -66,7 +67,7 @@ exports.storeSMSCore = async (req, res) => {
                 })
             }else{
                 await registerDeviceDrona(data);
-                pushToDrona(rarFileName, req.body.deviceId);
+                await pushToDrona(rarFileName, req.body.deviceId);
                 fs.unlinkSync(jsonFileName);
                 res.json({
                     status: true,
@@ -176,6 +177,7 @@ function registerDeviceDrona(data){
         axios(configData)
         .then(function (response) {
             console.log(response.data);
+            resolve(response.data);
         })
         .catch(function (error) {
             console.log(error);
@@ -183,7 +185,7 @@ function registerDeviceDrona(data){
     });
 }
 
-async function pushToDrona(zipFileName, deviceId){
+function pushToDrona(zipFileName, deviceId){
     return new Promise(async function(resolve, reject){
         const form_data = new FormData();
         form_data.append("file", fs.createReadStream(zipFileName));
@@ -201,6 +203,7 @@ async function pushToDrona(zipFileName, deviceId){
         .then(function (response) {
             console.log(response.data);
             fs.unlinkSync(zipFileName);
+            resolve(response.data);
         })
         .catch(function (error) {
             console.log(error);
