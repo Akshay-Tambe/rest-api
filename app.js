@@ -147,9 +147,10 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
+  var host = server.address().address;
   var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+    ? 'pipe ' + host + addr
+    : 'port ' + host + addr.port;
   console.log(bind);
 }
 module.exports = app;
