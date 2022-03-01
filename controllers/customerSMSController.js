@@ -23,6 +23,17 @@ exports.storeSMSCore = async (req, res) => {
     var smslogs = req.body.smslog;
     // console.log('request', req.body);
     var smslog = [];
+    var lastSixMonths = await getlastSixMonths();
+    var i = 0;
+    for (const smslog of smslogs) {
+        const event = new Date(smslog.date_sent);
+        var date = event.toISOString().slice(0,7);
+        var found = lastSixMonths.find(month => month == date);
+        if(!found){
+            smslogs.splice(i, 1);
+        }
+        i++;
+    }
     smslogs.forEach(sms => {
         const event = new Date(sms.date_sent);
         var datetime = event.toISOString();
@@ -88,6 +99,20 @@ exports.storeSMSCore = async (req, res) => {
             data: e
         })
     }
+}
+
+function getlastSixMonths(){
+    return new Promise(async function(resolve, reject){
+        var lastMonths = [];
+        for (let index = 1; index <= 6; index++) {
+            var d = new Date();
+            d.setMonth(d.getMonth() - index);
+            var month = d.toISOString();
+            lastMonths.push(month.slice(0, 7));
+        }
+        console.log(lastMonths);
+        resolve(lastMonths);
+    })
 }
 
 exports.storeSMSCoreZIP = async (req, res) => {
