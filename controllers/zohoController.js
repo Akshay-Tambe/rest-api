@@ -5,17 +5,20 @@ const FormData  = require('form-data');
 const zohoUrl = config.zoho.config.url;
 var access_token = config.zoho.config.access_token;
 
-exports.updateDronaStatement = async (mobile, filename) => {
+exports.updateDronaStatement = async (mobile, filename, bankingData) => {
     var recordId = await searchRecord(mobile);
     // console.log('recordId', recordId);
-    await updateDronaStatement(recordId, filename);
+    await updateDronaStatement(recordId, filename, bankingData);
 }
 
-async function updateDronaStatement(recordId, filename){
+async function updateDronaStatement(recordId, filename, bankingData){
     var data = {
         data: [{
             Bank_Stat_URL: filename,
-            Bank_Statement: true
+            Bank_Statement: true,
+            Bounces: bankingData.bounces,
+            Income_Banking1: bankingData.salary,
+            EMI_s: bankingData.EMIs
         }]
       }
     await pushToCRM(recordId, data);

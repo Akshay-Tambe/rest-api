@@ -271,10 +271,19 @@ exports.fetchDronaData = async (req, res) => {
     console.log('request', req.body.deviceId);
     var deviceId = req.body.deviceId;
     var data = await fetchFromDrona(deviceId);
+    var bounces = getBounces(data);
+    var salary = getSalary(data);
+    var EMIs = getEMIs(data);
+    
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
+        var bankingData = {
+            bounces: bounces,
+            salary: salary,
+            EMIs : EMIs
+        }
         var filename = await getTransactionFromSMS(deviceId);
-        zohoController.updateDronaStatement(sms.mobile, filename);
+        zohoController.updateDronaStatement(sms.mobile, filename, bankingData);
         res.json({
             status: true,
             data: filename
@@ -285,6 +294,38 @@ exports.fetchDronaData = async (req, res) => {
             status: false,
             data: "There is an error"
         })
+    }
+}
+
+function getBounces(data){
+    var count = 0;
+    for (const bounces of data.sms_profile.bounces_charges) {
+        count += bounces.count;
+    }
+    return count;
+}
+
+function getEMIs(data){
+    var emi = 0;
+    if(data.sms_profile.loans.length>0){
+        for (const loans of data.sms_profile.loans) {
+            emi = emi + parseInt(loans.emis[0].amount);
+        }
+    }
+    return emi;
+}
+
+function getSalary(data){
+    var count = 0;
+    var salary = 0;
+    if(data.sms_profile.salary.length>0){
+        for (const salaries of data.sms_profile.salary) {
+            salary = salary + parseInt(salaries.amount);
+            count++;
+        }
+        return parseInt(salary/count);
+    }else{
+        return salary;
     }
 }
 
