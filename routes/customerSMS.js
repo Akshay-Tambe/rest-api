@@ -17,5 +17,5 @@ router
 router
 .route('/fetchSMS/:mobile')
   .get(customerSMSController.fetchSMS);
-
+  
 module.exports = router;

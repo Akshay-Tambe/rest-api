@@ -9,7 +9,7 @@ const multiparty = require('multiparty');
 const path = require("path");
 const JSZip = require('jszip');
 const buffer = require("buffer");
-const config = require('./../config/config.js');
+const config = require('../config/config');
 var json2xls = require('json2xls');
 const pdf = require('dynamic-html-pdf');
 const commonController = require('./commonController');
@@ -22,6 +22,7 @@ exports.storeSMSCore = async (req, res) => {
     // var checkDevice = await checkDronaDevice(req.body.deviceId);
     var smslogs = req.body.smslog;
     // console.log('request', req.body);
+    var smsArray = [];
     var smslog = [];
     var lastSixMonths = await getlastSixMonths();
     var i = 0;
@@ -29,12 +30,11 @@ exports.storeSMSCore = async (req, res) => {
         const event = new Date(smslog.date_sent);
         var date = event.toISOString().slice(0,7);
         var found = lastSixMonths.find(month => month == date);
-        if(!found){
-            smslogs.splice(i, 1);
+        if(found != null){
+            smsArray.push(smslog);
         }
-        i++;
     }
-    smslogs.forEach(sms => {
+    smsArray.forEach(sms => {
         const event = new Date(sms.date_sent);
         var datetime = event.toISOString();
         smslog.push({origin: sms.origin, body: sms.body, date_sent:datetime})
@@ -56,7 +56,7 @@ exports.storeSMSCore = async (req, res) => {
         
             var sms = new customerSMS();
             sms.mobile = req.body.mobile;
-            sms.smslog = smslogs;
+            sms.smslog = smsArray;
             sms.deviceId = req.body.deviceId;
             await sms.save();
             
