@@ -278,7 +278,7 @@ exports.fetchDronaData = async (req, res) => {
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
         var bankingData = {
-            bounces: bounces,
+            bounces: bounces.toString(),
             salary: salary,
             EMIs : EMIs
         }
