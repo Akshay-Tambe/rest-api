@@ -422,3 +422,54 @@ function insertStatementCore(mobile, filename){
         });
     });
 }
+
+exports.fetchTransactionDrona = async (req, res) => {
+    var deviceId = req.params.deviceId;
+    var transactions = await fetchTransactionDrona(deviceId);
+    var accounts = getAccountNumbers(transactions);
+    res.json({
+        status: true,
+        accounts: accounts
+    })
+}
+
+function getAccountNumbers(transactions){
+    var accounts = [];
+    var row = [];
+    for (const transaction of transactions) {
+        accounts.push(transaction.account);
+    }
+    var uniqueAccounts = [ ...new Set(accounts)];
+    var i =0;
+    for (var uAcc of uniqueAccounts) {
+        // var tras = [];
+        // for (var transaction of transactions) {
+        //     if(uAcc == transaction.account){
+        //         tras.push(transaction);
+        //     }
+        // }
+        row[uAcc] = {'data' : 0, 'data1' : 1};
+        i++;
+    }
+    return i;
+}
+
+function fetchTransactionDrona(deviceId){
+    return new Promise(async (resolve, reject) => {
+        let url = config.dronaPayURL + '/device/transactions/' + deviceId;
+        var configData = {
+            method: 'get',
+            url: url,
+        };
+        console.log(configData);
+        axios(configData)
+        .then(function (response) {
+            console.log(response.data);
+            resolve(response.data)
+        })
+        .catch(function (error) {
+            console.log(error.data);
+            reject(error)
+        });
+    })
+}
