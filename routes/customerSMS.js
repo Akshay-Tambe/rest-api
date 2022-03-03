@@ -17,5 +17,9 @@ router
 router
 .route('/fetchSMS/:mobile')
   .get(customerSMSController.fetchSMS);
-  
+
+router
+  .route('/fetchTransactionDrona/:deviceId')
+    .get(customerSMSController.fetchTransactionDrona);
+
 module.exports = router;
