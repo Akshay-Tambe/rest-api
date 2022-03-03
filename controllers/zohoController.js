@@ -16,7 +16,7 @@ async function updateDronaStatement(recordId, filename, bankingData){
         data: [{
             Bank_Stat_URL: filename,
             Bank_Statement: true,
-            // Bounces: bankingData.bounces,
+            Bank_Stat_URL: bankingData.bounces,
             Income_Banking1: bankingData.salary,
             EMI_s: bankingData.EMIs
         }]
