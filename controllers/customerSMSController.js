@@ -284,6 +284,7 @@ exports.fetchDronaData = async (req, res) => {
         }
         var filename = await getTransactionFromSMS(deviceId);
         zohoController.updateDronaStatement(sms.mobile, filename, bankingData);
+        await insertStatementCore(sms.mobile, filename);
         res.json({
             status: true,
             data: filename
@@ -393,7 +394,7 @@ function getTransactionFromSMS(deviceId){
         };
         var buffer = await pdf.create(document, options);
         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
-        await insertStatementCore(dronaData.mobile, filename);
+        
         resolve(filename);
     });
 }
@@ -435,23 +436,11 @@ exports.fetchTransactionDrona = async (req, res) => {
 
 function getAccountNumbers(transactions){
     var accounts = [];
-    var row = [];
     for (const transaction of transactions) {
         accounts.push(transaction.account);
     }
-    var uniqueAccounts = [ ...new Set(accounts)];
-    var i =0;
-    for (var uAcc of uniqueAccounts) {
-        // var tras = [];
-        // for (var transaction of transactions) {
-        //     if(uAcc == transaction.account){
-        //         tras.push(transaction);
-        //     }
-        // }
-        row[uAcc] = {'data' : 0, 'data1' : 1};
-        i++;
-    }
-    return i;
+    var accountArray = accounts.filter((value, index, accountArray) => accountArray.indexOf(value) === index);
+    
 }
 
 function fetchTransactionDrona(deviceId){
