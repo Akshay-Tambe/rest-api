@@ -41,7 +41,7 @@
                 <td colspan="3" style="padding: 7px; border: 1px solid #999;" colspan="2">Amount</td>
             </tr>
             {{#each repeating_credits}}
-            <tr>
+            <tr style="background-color: rgb(0, 141, 0);">
                 <td colspan="2" style="padding: 7px; border: 1px solid #999;">{{@key}}</td>
                 <td colspan="3" style="padding: 7px; border: 1px solid #999;">
                     {{#each .}}
@@ -91,7 +91,7 @@
     {{/each}}
 
     <br><br><br>
-    <table style="width: 100%;">
+    <table style="width: 100%; background-color: rgb(0, 141, 0);">
         <tr>
             <td colspan="2" style="background-color: #999; padding: 7px;"><b>Salary</b></td>
         </tr>
@@ -112,7 +112,7 @@
             <td colspan="3" style="background-color: #999; padding: 7px;"><b>Loans</b></td>
         </tr>
         {{#each data.loans}}
-        <tr>
+        <tr style="background-color: rgb(255, 115, 50);">
             <td style="padding: 7px; border: 1px solid #999;">Loans Ac: {{acct_no}}</td>
             <td style="padding: 7px; border: 1px solid #999;">Lender: {{lender}}</td>
             <td style="padding: 7px; border: 1px solid #999;">Loan type: {{loan_type}}</td>
@@ -130,7 +130,7 @@
         {{/each}}
     </table>
 
-    <table style="width: 100%;">
+    <table style="width: 100%; background-color: rgb(100, 0, 0);">
         <tr>
             <td colspan="2" style="background-color: #999; padding: 7px;"><b>Bounces</b></td>
         </tr>
@@ -146,7 +146,7 @@
         {{/each}}
     </table>
 
-    <table style="width: 100%;">
+    <table style="width: 100%; background-color: rgb(100, 0, 0);">
         <tr>
             <td style="background-color: #999; padding: 7px;" colspan="3"><b>Overdues</b></td>
         </tr>
