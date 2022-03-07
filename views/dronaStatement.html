@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {{#ifCond data.isData}}
+    <table style="width: 100%; margin-top:2%;">
+        {{#each data}}
+            <tr>
+                <td colspan="5" style="background-color: #999; padding: 7px;">
+                    {{@key}}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #999; padding: 7px;">
+                    Sr. No.
+                </td>
+                <td style="border: 1px solid #999; padding: 7px;">
+                    Date
+                </td>
+                <td style="border: 1px solid #999; padding: 7px;">
+                    Narration
+                </td>
+                <td style="border: 1px solid #999; padding: 7px;">
+                    Credit
+                </td>
+                <td style="border: 1px solid #999; padding: 7px;">
+                    Debit
+                </td>
+            </tr>
+            {{#each this}}
+                <tr>
+                    <td style="border: 1px solid #999; padding: 7px;">
+                        {{inc @index}}
+                    </td>
+                    <td style="border: 1px solid #999; padding: 7px;">
+                        {{date}}
+                    </td>
+                    <td style="border: 1px solid #999; padding: 7px;">
+                        {{body}}
+                    </td>
+                    <td style="border: 1px solid #999; padding: 7px;">
+                        {{credit}}
+                    </td>
+                    <td style="border: 1px solid #999; padding: 7px;">
+                        {{debit}}
+                    </td>
+                </tr>
+            {{/each}}
+        {{/each}}
+    </table>
+    {{else}}
+        <h1>No data Found</h1>
+    {{/ifCond}}
+</body>
+</html>

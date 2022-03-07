@@ -7,6 +7,7 @@
     <title>Document</title>
 </head>
 <body style="font-size: 12px; font-family: 'Roboto', sans-serif; background-color: white;">
+    {{#ifCond1 data.isData}}
     {{#each data.banks}}
         <table style="width: 100%;">
             <tr style="background-color: #999;">
@@ -163,5 +164,8 @@
         </tr>
         {{/each}}
     </table>
+    {{else}}
+        <h1 style="text-align: center;">No data found</h1>
+    {{/ifCond1}}
 </body>
 </html>

@@ -22,4 +22,8 @@ router
   .route('/fetchTransactionDrona/:deviceId')
     .get(customerSMSController.fetchTransactionDrona);
 
+router
+  .route('/insertDronaTrans')
+    .post(customerSMSController.insertDronaTrans);
+
 module.exports = router;

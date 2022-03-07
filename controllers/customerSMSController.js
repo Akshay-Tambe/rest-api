@@ -367,6 +367,7 @@ exports.fetchSMS = async (req, res) => {
 
 function getTransactionFromSMS(deviceId){
     return new Promise(async function(resolve, reject){
+        var isData = false;
         var htmlTemp = fs.readFileSync('./views/template.html', 'utf8');
         var dronaData = await customerSMS.findOne({deviceId: deviceId});
         var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
@@ -380,6 +381,17 @@ function getTransactionFromSMS(deviceId){
             if(typeof bank.repeating_credits === 'undefined')
                 bank.repeating_credits = {};
         }
+        banks = banks.filter(item => item.transactions !== 0);
+        if(banks.length > 0){
+            isData = true
+        }
+        pdf.registerHelper("ifCond1", function(isData, options)
+        {
+            if(isData === true){
+                return options.fn(this);
+            }
+            return options.inverse(this);
+        });
         var options = {
             format: "A4",
             orientation: "landscape",
@@ -389,9 +401,10 @@ function getTransactionFromSMS(deviceId){
             type: 'buffer',
             template: htmlTemp,
             context: {
-            data: {banks, loans, bounces, overdues, salaries}
+            data: {banks, loans, bounces, overdues, salaries, isData}
             }
         };
+        console.log(isData)
         var buffer = await pdf.create(document, options);
         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
         
@@ -461,4 +474,112 @@ function fetchTransactionDrona(deviceId){
             reject(error)
         });
     })
+}
+
+exports.insertDronaTrans = async (req, res) => {
+    var dronaTran = await getDronaTrans(req.body.deviceId);
+    var bank_details = await organizeSms(dronaTran);
+    var buffer = await htmlToPdf(bank_details);
+    var dronaData = await customerSMS.findOne({deviceId: req.body.deviceId});
+    var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
+    var bankingData = {
+        bounces: "0",
+        salary: 0,
+        EMIs : 0
+    }
+    zohoController.updateDronaStatement(dronaData.mobile, filename, bankingData);
+    await insertStatementCore(dronaData.mobile, filename);
+    res.json({
+        data: filename
+    })
+}
+
+function getDronaTrans(deviceId){
+    return new Promise(async function(resolve, reject){
+        var configData = {
+            method: 'get',
+            url: `${config.dronaPayURL}/device/transactions/${deviceId}`,
+        }
+        console.log(configData)
+        axios(configData).
+        then(function(response){
+            // console.log(response.data);
+            resolve(response.data);
+        }).catch(function(error){
+            console.log(error.data)}); 
+    });
+}
+
+function organizeSms(smsDump) {
+    return new Promise(async function(resolve, reject){
+        var keys = [];
+        for (i=0; i<smsDump.length; i++){
+            // console.log(smsDump[i].origin);
+            var bankname = smsDump[i].origin
+            let bankString = bankname.slice(2,9);
+            keys.push(bankString);
+        }
+        let uniqueKeys = keys.filter((v, i, a) => a.indexOf(v) === i);
+        var bank_details = {};
+        for (i =0; i < uniqueKeys.length; i++){
+            var filterVal = uniqueKeys[i];
+            var organizedDetails=[];
+            for(j=0; j < smsDump.length; j++){
+                if (smsDump[j].origin.slice(2,9) == filterVal){
+                    if(smsDump[j].pos_credit === true){
+                        smsDump[j]['credit'] = smsDump[j].amount;
+                        smsDump[j]['debit'] = "0.00"
+                    }
+                    if(smsDump[j].pos_debit === true){
+                        smsDump[j]['debit'] = smsDump[j].amount;
+                        smsDump[j]['credit'] = "0.00"
+                    }
+                    smsDump[j]['date'] = smsDump[j].date_sent.toString().slice(0, 10);
+                    organizedDetails.push(smsDump[j]);
+                }
+            }
+            bank_details[uniqueKeys[i]] = organizedDetails.sort((a,b)=> (a.date < b.date ? 1 : -1));
+        }
+        resolve(bank_details);
+    })
+    
+}
+
+function htmlToPdf(bank_details){
+    return new Promise(async function(resolve, reject){
+        isData = false;
+        if(Object.keys(bank_details).length > 0){
+            isData = true;
+            bank_details.isData = true;
+        }else{
+            bank_details.isData = false;
+        }
+        console.log(bank_details.isData);
+        var options = {
+            format: "A4",
+            orientation: "landscape",
+            border: "10mm"
+        };
+        var htmlDoc = fs.readFileSync('./views/dronaStatement.html', 'utf8')
+        var document = {
+          type: 'buffer',
+          template: htmlDoc,
+          context: {
+            data: bank_details
+          }
+        };
+        pdf.registerHelper("ifCond", function(isData, options)
+        {
+            if(isData === true){
+                return options.fn(this);
+            }
+            return options.inverse(this);
+        });
+        pdf.registerHelper("inc", function(value, options)
+        {
+            return parseInt(value) + 1;
+        });
+        var contents = await pdf.create(document, options);
+        resolve(contents);
+    })   
 }
