@@ -291,7 +291,7 @@ exports.fetchDronaData = async (req, res) => {
         // var filename = await getTransactionFromSMS(deviceId);
         var filename = await commonController.uploadtoBucket("Card_Documents", sms.mobile, 'Statement', buffer, 'application/pdf', false);
         zohoController.updateDronaStatement(sms.mobile, filename);
-        zohoController.updateDronaSummery(sms.mobile, bankingData);
+        // zohoController.updateDronaSummery(sms.mobile, bankingData);
         await insertStatementCore(sms.mobile, filename);
         res.json({
             status: true,
