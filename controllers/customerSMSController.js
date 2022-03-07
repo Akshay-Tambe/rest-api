@@ -274,15 +274,20 @@ exports.fetchDronaData = async (req, res) => {
     var bounces = getBounces(data);
     var salary = getSalary(data);
     var EMIs = getEMIs(data);
-    
+    var avgBalance = getAvgBalance(data);
+    console.log(avgBalance)
+
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
-        var buffer = await insertDronaTrans(deviceId);
+        var bank_details = await insertDronaTrans(deviceId);
         var bankingData = {
             bounces: bounces.toString(),
             salary: salary,
-            EMIs : EMIs
+            EMIs : EMIs,
+            avgBalance: avgBalance
         }
+        var buffer = await htmlToPdf(bank_details, bankingData);
+        
         // var filename = await getTransactionFromSMS(deviceId);
         var filename = await commonController.uploadtoBucket("Card_Documents", sms.mobile, 'Statement', buffer, 'application/pdf', false);
         zohoController.updateDronaStatement(sms.mobile, filename);
@@ -301,6 +306,26 @@ exports.fetchDronaData = async (req, res) => {
     }
 }
 
+function getAvgBalance(data){
+    var banks = {};
+    if(data.sms_profile.bank_accounts.length > 0){
+        for (const bank_account of data.sms_profile.bank_accounts) {
+            var avgB = 0;
+            var i = 0;
+            if(Object.keys(bank_account.avg_balances).length>0){
+                for (const key in bank_account.avg_balances) {
+                    avgB += parseInt(bank_account.avg_balances[key]);
+                    i++;
+                }
+                // console.log(avgB)
+                banks[bank_account.bank] = parseInt(avgB/i);
+            }else{
+                banks[bank_account.bank] = 'Not detected';
+            }
+        }
+    }
+    return banks;
+}
 function getBounces(data){
     var count = 0;
     for (const bounces of data.sms_profile.bounces_charges) {
@@ -315,6 +340,8 @@ function getEMIs(data){
         for (const loans of data.sms_profile.loans) {
             emi = emi + parseInt(loans.emis[0].amount);
         }
+    }else{
+        emi = "Not detected"
     }
     return emi;
 }
@@ -329,9 +356,11 @@ function getSalary(data){
         }
         return parseInt(salary/count);
     }else{
-        return salary;
+        return "Not detected";
     }
 }
+
+
 
 async function fetchFromDrona(deviceId){
     return new Promise(function(resolve, reject) {
@@ -368,52 +397,52 @@ exports.fetchSMS = async (req, res) => {
     }
 }
 
-function getTransactionFromSMS(deviceId){
-    return new Promise(async function(resolve, reject){
-        var isData = false;
-        var htmlTemp = fs.readFileSync('./views/template.html', 'utf8');
-        var dronaData = await customerSMS.findOne({deviceId: deviceId});
-        var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
-        var loans = dronaData.dronaData[0].sms_profile.loans;
-        var bounces = dronaData.dronaData[0].sms_profile.bounces_charges;
-        var salaries = dronaData.dronaData[0].sms_profile.salary;
-        var overdues = dronaData.dronaData[0].sms_profile.overdue;
-        for (const bank of banks) {
-            if(typeof bank.repeating_debits === 'undefined')
-                bank.repeating_debits = {};
-            if(typeof bank.repeating_credits === 'undefined')
-                bank.repeating_credits = {};
-        }
-        banks = banks.filter(item => item.transactions !== 0);
-        if(banks.length > 0){
-            isData = true
-        }
-        pdf.registerHelper("ifCond1", function(isData, options)
-        {
-            if(isData === true){
-                return options.fn(this);
-            }
-            return options.inverse(this);
-        });
-        var options = {
-            format: "A4",
-            orientation: "landscape",
-            border: "10mm"
-        };
-        var document = {
-            type: 'buffer',
-            template: htmlTemp,
-            context: {
-            data: {banks, loans, bounces, overdues, salaries, isData}
-            }
-        };
-        console.log(isData)
-        var buffer = await pdf.create(document, options);
-        var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
+// function getTransactionFromSMS(deviceId){
+//     return new Promise(async function(resolve, reject){
+//         var isData = false;
+//         var htmlTemp = fs.readFileSync('./views/template.html', 'utf8');
+//         var dronaData = await customerSMS.findOne({deviceId: deviceId});
+//         var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
+//         var loans = dronaData.dronaData[0].sms_profile.loans;
+//         var bounces = dronaData.dronaData[0].sms_profile.bounces_charges;
+//         var salaries = dronaData.dronaData[0].sms_profile.salary;
+//         var overdues = dronaData.dronaData[0].sms_profile.overdue;
+//         for (const bank of banks) {
+//             if(typeof bank.repeating_debits === 'undefined')
+//                 bank.repeating_debits = {};
+//             if(typeof bank.repeating_credits === 'undefined')
+//                 bank.repeating_credits = {};
+//         }
+//         banks = banks.filter(item => item.transactions !== 0);
+//         if(banks.length > 0){
+//             isData = true
+//         }
+//         pdf.registerHelper("ifCond1", function(isData, options)
+//         {
+//             if(isData === true){
+//                 return options.fn(this);
+//             }
+//             return options.inverse(this);
+//         });
+//         var options = {
+//             format: "A4",
+//             orientation: "landscape",
+//             border: "10mm"
+//         };
+//         var document = {
+//             type: 'buffer',
+//             template: htmlTemp,
+//             context: {
+//             data: {banks, loans, bounces, overdues, salaries, isData}
+//             }
+//         };
+//         console.log(isData)
+//         var buffer = await pdf.create(document, options);
+//         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
         
-        resolve(filename);
-    });
-}
+//         resolve(filename);
+//     });
+// }
 
 function insertStatementCore(mobile, filename){
     return new Promise(async function(resolve, reject){
@@ -456,7 +485,6 @@ function getAccountNumbers(transactions){
         accounts.push(transaction.account);
     }
     var accountArray = accounts.filter((value, index, accountArray) => accountArray.indexOf(value) === index);
-    
 }
 
 function fetchTransactionDrona(deviceId){
@@ -483,8 +511,8 @@ function insertDronaTrans(deviceId) {
     return new Promise(async function(resolve, reject){
         var dronaTran = await getDronaTrans(deviceId);
         var bank_details = await organizeSms(dronaTran);
-        var buffer = await htmlToPdf(bank_details);
-        resolve(buffer);
+        // var buffer = await htmlToPdf(bank_details);
+        resolve(bank_details);
     })
 }
 
@@ -539,10 +567,12 @@ function organizeSms(smsDump) {
     
 }
 
-function htmlToPdf(bank_details){
+function htmlToPdf(bank_details, bankingData){
     return new Promise(async function(resolve, reject){
         isData = false;
-        console.log(bank_details.isData);
+        if(Object.keys(bank_details).length > 0){
+            isData = true
+        }
         var options = {
             format: "A4",
             orientation: "landscape",
@@ -553,10 +583,16 @@ function htmlToPdf(bank_details){
           type: 'buffer',
           template: htmlDoc,
           context: {
-            data: bank_details
+            data: {bank_details, bankingData}
           }
         };
-        
+        // pdf.registerHelper("ifCond1", function(isData, options)
+        // {
+        //     if(isData === true){
+        //         return options.fn(this);
+        //     }
+        //     return options.inverse(this);
+        // });
         pdf.registerHelper("inc", function(value, options)
         {
             return parseInt(value) + 1;
