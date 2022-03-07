@@ -7,7 +7,6 @@
     <title>Document</title>
 </head>
 <body>
-    {{#ifCond data.isData}}
     <table style="width: 100%; margin-top:2%;">
         {{#each data}}
             <tr>
@@ -53,8 +52,5 @@
             {{/each}}
         {{/each}}
     </table>
-    {{else}}
-        <h1>No data Found</h1>
-    {{/ifCond}}
 </body>
 </html>

@@ -277,13 +277,16 @@ exports.fetchDronaData = async (req, res) => {
     
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
+        var buffer = await insertDronaTrans(deviceId);
         var bankingData = {
             bounces: bounces.toString(),
             salary: salary,
             EMIs : EMIs
         }
-        var filename = await getTransactionFromSMS(deviceId);
-        zohoController.updateDronaStatement(sms.mobile, filename, bankingData);
+        // var filename = await getTransactionFromSMS(deviceId);
+        var filename = await commonController.uploadtoBucket("Card_Documents", sms.mobile, 'Statement', buffer, 'application/pdf', false);
+        zohoController.updateDronaStatement(sms.mobile, filename);
+        zohoController.updateDronaSummery(sms.mobile, bankingData);
         await insertStatementCore(sms.mobile, filename);
         res.json({
             status: true,
@@ -476,21 +479,12 @@ function fetchTransactionDrona(deviceId){
     })
 }
 
-exports.insertDronaTrans = async (req, res) => {
-    var dronaTran = await getDronaTrans(req.body.deviceId);
-    var bank_details = await organizeSms(dronaTran);
-    var buffer = await htmlToPdf(bank_details);
-    var dronaData = await customerSMS.findOne({deviceId: req.body.deviceId});
-    var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
-    var bankingData = {
-        bounces: "0",
-        salary: 0,
-        EMIs : 0
-    }
-    zohoController.updateDronaStatement(dronaData.mobile, filename, bankingData);
-    await insertStatementCore(dronaData.mobile, filename);
-    res.json({
-        data: filename
+function insertDronaTrans(deviceId) {
+    return new Promise(async function(resolve, reject){
+        var dronaTran = await getDronaTrans(deviceId);
+        var bank_details = await organizeSms(dronaTran);
+        var buffer = await htmlToPdf(bank_details);
+        resolve(buffer);
     })
 }
 
@@ -503,7 +497,7 @@ function getDronaTrans(deviceId){
         console.log(configData)
         axios(configData).
         then(function(response){
-            // console.log(response.data);
+            console.log(response.data);
             resolve(response.data);
         }).catch(function(error){
             console.log(error.data)}); 
@@ -548,12 +542,6 @@ function organizeSms(smsDump) {
 function htmlToPdf(bank_details){
     return new Promise(async function(resolve, reject){
         isData = false;
-        if(Object.keys(bank_details).length > 0){
-            isData = true;
-            bank_details.isData = true;
-        }else{
-            bank_details.isData = false;
-        }
         console.log(bank_details.isData);
         var options = {
             format: "A4",
@@ -568,13 +556,7 @@ function htmlToPdf(bank_details){
             data: bank_details
           }
         };
-        pdf.registerHelper("ifCond", function(isData, options)
-        {
-            if(isData === true){
-                return options.fn(this);
-            }
-            return options.inverse(this);
-        });
+        
         pdf.registerHelper("inc", function(value, options)
         {
             return parseInt(value) + 1;
