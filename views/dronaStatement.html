@@ -7,8 +7,49 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>Account summery as per SMS</h1>
+    <table style="width: 100%; margin-top: 2%">
+        <tr>
+            <td style="background-color: #999; padding: 7px;" colspan="2">
+                <b>Average Balance as per 6 months</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="background-color: rgb(212, 212, 212); padding: 7px;">
+                <b>Bank Name</b>
+            </td>
+            <td style="background-color: rgb(212, 212, 212); padding: 7px;">
+                <b>Average Balance (In Rs.)</b>
+            </td>
+        </tr>
+            {{#each data.bankingData.avgBalance}}
+            <tr>
+            <td style="border: 1px solid #999; padding: 7px;">
+                <b>{{@key}}</b>
+            </td>
+            <td style="border: 1px solid #999; padding: 7px;">
+                <b>{{this}}</b>
+            </td>
+            </tr>
+            {{/each}}
+    </table>
+    <table style="width: 100%; margin-top: 2%">
+        <tr>
+            <td style="border: 1px solid #999; padding: 7px;"><b>No. of bounces in last 6 months</b></td>
+            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.bounces}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #999; padding: 7px;"><b>Total EMI amount per month (In Rs.)</b></td>
+            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.EMIs}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #999; padding: 7px;"><b>Salary per month (In Rs.)</b></td>
+            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.salary}}</td>
+        </tr>
+    </table>
+    <h1>Account transactions as per SMS</h1>
     <table style="width: 100%; margin-top:2%;">
-        {{#each data}}
+        {{#each data.bank_details}}
             <tr>
                 <td colspan="5" style="background-color: #999; padding: 7px;">
                     {{@key}}
