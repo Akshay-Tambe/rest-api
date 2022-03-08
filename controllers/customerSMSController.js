@@ -275,7 +275,8 @@ exports.fetchDronaData = async (req, res) => {
     var salary = getSalary(data);
     var EMIs = getEMIs(data);
     var avgBalance = getAvgBalance(data);
-    console.log(avgBalance)
+    // var overdues = getOverdues(data.sms_profile.overdue);
+    // console.log(overdues)
 
     var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
     if(sms !== null){
@@ -284,7 +285,8 @@ exports.fetchDronaData = async (req, res) => {
             bounces: bounces.toString(),
             salary: salary,
             EMIs : EMIs,
-            avgBalance: avgBalance
+            avgBalance: avgBalance,
+            // overdues: overdues
         }
         var buffer = await htmlToPdf(bank_details, bankingData);
         
@@ -303,6 +305,12 @@ exports.fetchDronaData = async (req, res) => {
             status: false,
             data: "There is an error"
         })
+    }
+}
+
+function getOverdues(data){
+    if(data.length > 0){
+        return data;
     }
 }
 
@@ -396,53 +404,6 @@ exports.fetchSMS = async (req, res) => {
         })
     }
 }
-
-// function getTransactionFromSMS(deviceId){
-//     return new Promise(async function(resolve, reject){
-//         var isData = false;
-//         var htmlTemp = fs.readFileSync('./views/template.html', 'utf8');
-//         var dronaData = await customerSMS.findOne({deviceId: deviceId});
-//         var banks = dronaData.dronaData[0].sms_profile.bank_accounts;
-//         var loans = dronaData.dronaData[0].sms_profile.loans;
-//         var bounces = dronaData.dronaData[0].sms_profile.bounces_charges;
-//         var salaries = dronaData.dronaData[0].sms_profile.salary;
-//         var overdues = dronaData.dronaData[0].sms_profile.overdue;
-//         for (const bank of banks) {
-//             if(typeof bank.repeating_debits === 'undefined')
-//                 bank.repeating_debits = {};
-//             if(typeof bank.repeating_credits === 'undefined')
-//                 bank.repeating_credits = {};
-//         }
-//         banks = banks.filter(item => item.transactions !== 0);
-//         if(banks.length > 0){
-//             isData = true
-//         }
-//         pdf.registerHelper("ifCond1", function(isData, options)
-//         {
-//             if(isData === true){
-//                 return options.fn(this);
-//             }
-//             return options.inverse(this);
-//         });
-//         var options = {
-//             format: "A4",
-//             orientation: "landscape",
-//             border: "10mm"
-//         };
-//         var document = {
-//             type: 'buffer',
-//             template: htmlTemp,
-//             context: {
-//             data: {banks, loans, bounces, overdues, salaries, isData}
-//             }
-//         };
-//         console.log(isData)
-//         var buffer = await pdf.create(document, options);
-//         var filename = await commonController.uploadtoBucket("Card_Documents", dronaData.mobile, 'Statement', buffer, 'application/pdf', false);
-        
-//         resolve(filename);
-//     });
-// }
 
 function insertStatementCore(mobile, filename){
     return new Promise(async function(resolve, reject){
