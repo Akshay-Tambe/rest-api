@@ -119,6 +119,23 @@
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{data.bankingData.salary}}</td>
         </tr>
         <tr>
+            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>Latest paid utility bills</b></td>
+            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="background-color: rgb(212, 212, 212); padding: 3px; vertical-align: top;">Utility Mode</td>
+                        <td style="background-color: rgb(212, 212, 212); padding: 3px; vertical-align: top;">Amount (In Rs.)</td>
+                    </tr>
+                    {{#each data.bankingData.utilities}}
+                        <tr>
+                            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{utility}}</td>
+                            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{amount}}</td>
+                        </tr>
+                    {{/each}}
+                </table>
+            </td>
+        </tr>
+        <tr>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>Overdues in last 6 months</b></td>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">
                 <table style="width: 100%;">
