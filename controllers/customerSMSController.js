@@ -407,8 +407,10 @@ function getSalary(data){
     var salary = 0;
     if(data.length>0){
         for (const salaries of data) {
-            salary = salary + parseInt(salaries.amount);
-            count++;
+            if(salaries.count>0){
+                salary += parseInt(salaries.details[0].amount);
+                count++;
+            }
         }
         return parseInt(salary/count);
     }else{
