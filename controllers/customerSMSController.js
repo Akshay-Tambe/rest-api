@@ -270,6 +270,7 @@ function getCurrentTime(){
 exports.fetchDronaData = async (req, res) => {
     console.log('request', req.body.deviceId);
     var deviceId = req.body.deviceId;
+    var sms = await customerSMS.findOne({deviceId: deviceId});
     var data = await fetchFromDrona(deviceId);
     var bounces = getBounces(data.sms_profile.bounces_charges);
     var salary = getSalary(data.sms_profile.salary);
