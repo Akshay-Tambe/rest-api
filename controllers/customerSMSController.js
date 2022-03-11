@@ -358,14 +358,14 @@ function getAvgBalance(data){
             if(bank_account.repeating_credits.length>0){
                 for (const rc of bank_account.repeating_credits) {
                     if(rc.count === 0){
-                        rc.details = [];
+                        rc.details = [{amount: "0.00", info: "Data not found"}];
                     }
                 }
             }
             if(bank_account.repeating_debits.length>0){
                 for (const rc of bank_account.repeating_debits) {
                     if(rc.count === 0){
-                        rc.details = [];
+                        rc.details = [{amount: "0.00", info: "Data not found"}];
                     }
                 }
             }
