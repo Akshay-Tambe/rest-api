@@ -278,8 +278,8 @@ exports.fetchDronaData = async (req, res) => {
     var avgBalance = getAvgBalance(data.sms_profile.bank_accounts);
     var overdues = getOverdues(data.sms_profile.overdue);
     var credit_cards = getCC(data.sms_profile.cards);
-    // var utitlities = getUtilities(data.sms_profile.utilities);
-    console.log(credit_cards);
+    var utilities = getUtilities(data.sms_profile.utilities);
+    // console.log(credit_cards);
         var bank_details = await insertDronaTrans(deviceId);
         var bankingData = {
             bounces: bounces.toString(),
@@ -287,7 +287,8 @@ exports.fetchDronaData = async (req, res) => {
             EMIs : EMIs,
             avgBalance: avgBalance,
             overdues: overdues,
-            cc : credit_cards
+            cc : credit_cards,
+            utilities: utilities
         }
         var buffer = await htmlToPdf(bank_details, bankingData);
         // var path = `./pdf/${Date.now()}.pdf`;
@@ -295,13 +296,25 @@ exports.fetchDronaData = async (req, res) => {
         // var filename = await getTransactionFromSMS(deviceId);
         var filename = await commonController.uploadtoBucket("Card_Documents", sms.mobile, 'Statement', buffer, 'application/pdf', false);
         zohoController.updateDronaStatement(sms.mobile, filename);
-        // // zohoController.updateDronaSummery(sms.mobile, bankingData);
+        // // // zohoController.updateDronaSummery(sms.mobile, bankingData);
         await insertStatementCore(sms.mobile, filename);
         res.json({
             status: true,
             data: bankingData
         })
     
+}
+
+function getUtilities(data){
+    var utilities = [];
+    if(data.length>0){
+        for (const utility of data) {
+            if(utility.last_due_amount !== undefined)
+                utilities.push({utility: utility.utilty, amount: utility.last_due_amount})
+        }
+    }
+    utilities.push({utility: "Not detected", amount: "0.00"})
+    return utilities;
 }
 
 function getCC(data){
