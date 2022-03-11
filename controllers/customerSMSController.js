@@ -271,82 +271,129 @@ exports.fetchDronaData = async (req, res) => {
     console.log('request', req.body.deviceId);
     var deviceId = req.body.deviceId;
     var data = await fetchFromDrona(deviceId);
-    var bounces = getBounces(data);
-    var salary = getSalary(data);
-    var EMIs = getEMIs(data);
-    var avgBalance = getAvgBalance(data);
-    // var overdues = getOverdues(data.sms_profile.overdue);
-    // console.log(overdues)
-
-    var sms = await customerSMS.findOneAndUpdate({deviceId: deviceId}, { $set: {dronaData: data}});
-    if(sms !== null){
+    var bounces = getBounces(data.sms_profile.bounces_charges);
+    var salary = getSalary(data.sms_profile.salary);
+    var EMIs = getEMIs(data.sms_profile.loans);
+    var avgBalance = getAvgBalance(data.sms_profile.bank_accounts);
+    var overdues = getOverdues(data.sms_profile.overdue);
+    var credit_cards = getCC(data.sms_profile.cards);
+    // var utitlities = getUtilities(data.sms_profile.utilities);
+    console.log(credit_cards);
         var bank_details = await insertDronaTrans(deviceId);
         var bankingData = {
             bounces: bounces.toString(),
             salary: salary,
             EMIs : EMIs,
             avgBalance: avgBalance,
-            // overdues: overdues
+            overdues: overdues,
+            cc : credit_cards
         }
         var buffer = await htmlToPdf(bank_details, bankingData);
-        
+        // var path = `./pdf/${Date.now()}.pdf`;
+        // await fs.createWriteStream(path).write(buffer);
         // var filename = await getTransactionFromSMS(deviceId);
         var filename = await commonController.uploadtoBucket("Card_Documents", sms.mobile, 'Statement', buffer, 'application/pdf', false);
         zohoController.updateDronaStatement(sms.mobile, filename);
-        // zohoController.updateDronaSummery(sms.mobile, bankingData);
+        // // zohoController.updateDronaSummery(sms.mobile, bankingData);
         await insertStatementCore(sms.mobile, filename);
         res.json({
             status: true,
-            data: filename
+            data: bankingData
         })
-    }else{
-        // resolve(false);
-        res.json({
-            status: false,
-            data: "There is an error"
-        })
+    
+}
+
+function getCC(data){
+    var cc = [];
+    if(data.length>0){
+        for (const card of data) {
+            if(card.type == 'Credit')
+                if(card.available_limit_or_balance !== undefined)
+                    cc.push({bank: card.bank, limit: card.available_limit_or_balance})
+                else
+                    cc.push({bank: card.bank, limit: 'Not detected'})
+        }
     }
+    return cc;
 }
 
 function getOverdues(data){
+    var overdues = {};
+    
     if(data.length > 0){
-        return data;
+        for (const overdue of data) {
+            if(overdue.count > 0){
+                var obj = [];
+                for (const detail of overdue.details) {
+                    if(detail.utility !== undefined)
+                        obj.push({amount : detail.due_amount, utility : detail.utility});
+                    else
+                        obj.push({amount : detail.due_amount, utility : 'card'});
+                }
+                overdues[overdue.month] = obj;
+            }
+        }
     }
+    return overdues;
 }
 
 function getAvgBalance(data){
     var banks = {};
-    if(data.sms_profile.bank_accounts.length > 0){
-        for (const bank_account of data.sms_profile.bank_accounts) {
+    if(data.length > 0){
+        for (const bank_account of data) {
             var avgB = 0;
             var i = 0;
+            var obj;
             if(Object.keys(bank_account.avg_balances).length>0){
                 for (const key in bank_account.avg_balances) {
-                    avgB += parseInt(bank_account.avg_balances[key]);
+                    if(bank_account.avg_balances[key] != "")
+                        avgB += parseInt(bank_account.avg_balances[key]);
                     i++;
                 }
-                // console.log(avgB)
-                banks[bank_account.bank] = parseInt(avgB/i);
+                obj = parseInt(avgB/i);
             }else{
-                banks[bank_account.bank] = 'Not detected';
+                obj = 'Not detected';
             }
+            if(bank_account.repeating_credits.length>0){
+                for (const rc of bank_account.repeating_credits) {
+                    if(rc.count === 0){
+                        rc.details = [];
+                    }
+                }
+            }
+            if(bank_account.repeating_debits.length>0){
+                for (const rc of bank_account.repeating_debits) {
+                    if(rc.count === 0){
+                        rc.details = [];
+                    }
+                }
+            }
+            banks[`${bank_account.bank}-${bank_account.account}`] = {'avg_bal' : obj, 'recurring_credits' : bank_account.repeating_credits, 'repeating_debits' : bank_account.repeating_debits};
         }
     }
     return banks;
 }
 function getBounces(data){
     var count = 0;
-    for (const bounces of data.sms_profile.bounces_charges) {
-        count += bounces.count;
+    if(data.length>0){
+        for (const bounces of data) {
+            count += bounces.count;
+        }
     }
     return count;
 }
 
 function getEMIs(data){
     var emi = 0;
-    if(data.sms_profile.loans.length>0){
-        for (const loans of data.sms_profile.loans) {
-            emi = emi + parseInt(loans.emis[0].amount);
+    if(data.length>0){
+        for (const loans of data) {
+            var e = 0;
+            for (const loan of loans.emis) {
+                if(loan.count>0){
+                    e = parseInt(loan.details[0].amount);
+                }
+            }
+            emi += e;
         }
     }else{
         emi = "Not detected"
@@ -357,8 +404,8 @@ function getEMIs(data){
 function getSalary(data){
     var count = 0;
     var salary = 0;
-    if(data.sms_profile.salary.length>0){
-        for (const salaries of data.sms_profile.salary) {
+    if(data.length>0){
+        for (const salaries of data) {
             salary = salary + parseInt(salaries.amount);
             count++;
         }
@@ -547,13 +594,6 @@ function htmlToPdf(bank_details, bankingData){
             data: {bank_details, bankingData}
           }
         };
-        // pdf.registerHelper("ifCond1", function(isData, options)
-        // {
-        //     if(isData === true){
-        //         return options.fn(this);
-        //     }
-        //     return options.inverse(this);
-        // });
         pdf.registerHelper("inc", function(value, options)
         {
             return parseInt(value) + 1;

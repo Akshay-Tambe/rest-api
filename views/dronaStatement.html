@@ -6,87 +6,216 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body>
-    <h1>Account summery as per SMS</h1>
-    <table style="width: 100%; margin-top: 2%">
+<body style="font-size:6px;">
+    <h1>Account summary as per SMS</h1>
+    <table style="width: 100%; margin-top: 2%" valign="top">
         <tr>
-            <td style="background-color: #999; padding: 7px;" colspan="2">
+            <td style="background-color: #999; padding: 3px;" colspan="4">
                 <b>Average Balance as per 6 months</b>
             </td>
         </tr>
         <tr>
-            <td style="background-color: rgb(212, 212, 212); padding: 7px;">
+            <td style="background-color: rgb(212, 212, 212); padding: 3px;">
                 <b>Bank Name</b>
             </td>
-            <td style="background-color: rgb(212, 212, 212); padding: 7px;">
+            <td style="background-color: rgb(212, 212, 212); padding: 3px;">
                 <b>Average Balance (In Rs.)</b>
+            </td>
+            <td style="background-color: rgb(212, 212, 212); padding: 3px;">
+                Recurring Credit
+            </td>
+            <td style="background-color: rgb(212, 212, 212); padding: 3px;">
+                Recurring Debit
             </td>
         </tr>
             {{#each data.bankingData.avgBalance}}
             <tr>
-            <td style="border: 1px solid #999; padding: 7px;">
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
                 <b>{{@key}}</b>
             </td>
-            <td style="border: 1px solid #999; padding: 7px;">
-                <b>{{this}}</b>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                <b>{{this.avg_bal}}</b>
+            </td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="background-color: #999; padding: 3px;">Month</td>
+                        <td style="background-color: #999; padding: 3px;">Details</td>
+                    </tr>
+                    {{#each this.recurring_credits}}
+                        <tr>
+                            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                                {{month}}
+                            </td>
+                            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="background-color: #999; padding: 3px;">
+                                            Amount (In Rs.)
+                                        </td>
+                                        <td style="background-color: #999; padding: 3px;">
+                                            Narration
+                                        </td>
+                                    </tr>
+                                    {{#each details}}
+                                        <tr>
+                                            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{amount}}</td>
+                                            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{info}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </table>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </table>
+            </td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="background-color: #999; padding: 3px;">Month</td>
+                        <td style="background-color: #999; padding: 3px;">Details</td>
+                    </tr>
+                    {{#each this.repeating_debits}}
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                            {{month}}
+                        </td>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="background-color: #999; padding: 3px;">
+                                        Amount (In Rs.)
+                                    </td>
+                                    <td style="background-color: #999; padding: 3px;">
+                                        Narration
+                                    </td>
+                                </tr>
+                                {{#each details}}
+                                    <tr>
+                                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{amount}}</td>
+                                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{info}}</td>
+                                    </tr>
+                                {{/each}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </table>
             </td>
             </tr>
             {{/each}}
     </table>
     <table style="width: 100%; margin-top: 2%">
         <tr>
-            <td style="border: 1px solid #999; padding: 7px;"><b>No. of bounces in last 6 months</b></td>
-            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.bounces}}</td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;"><b>No. of bounces in last 6 months</b></td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{data.bankingData.bounces}}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid #999; padding: 7px;"><b>Total EMI amount per month (In Rs.)</b></td>
-            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.EMIs}}</td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;"><b>Total EMI amount per month (In Rs.)</b></td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{data.bankingData.EMIs}}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid #999; padding: 7px;"><b>Salary per month (In Rs.)</b></td>
-            <td style="border: 1px solid #999; padding: 7px;">{{data.bankingData.salary}}</td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;"><b>Salary per month (In Rs.)</b></td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{data.bankingData.salary}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;"><b>Overdues in last 6 months</b></td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="background-color: #999; padding: 3px; vertical-align: top;">
+                            Month
+                        </td>
+                        <td style="background-color: #999; padding: 3px; vertical-align: top;">
+                            Details
+                        </td>
+                    </tr>
+                    {{#each data.bankingData.overdues}}
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                            {{@key}}
+                        </td>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="background-color: #999; padding: 3px; vertical-align: top;">
+                                        Utitlity Mode
+                                    </td>
+                                    <td style="background-color: #999; padding: 3px; vertical-align: top;">
+                                        Amount (In Rs.)
+                                    </td>
+                                </tr>
+                                {{#each this}}
+                                    <tr>
+                                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{utility}}</td>
+                                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{amount}}</td>
+                                    </tr>
+                                {{/each}}
+                            </table>
+                        </td>
+                    {{/each}}
+                </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;"><b>Credit Cards</b></td>
+            <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="background-color: #999; padding: 3px; vertical-align: top;">Bank Name</td>
+                        <td style="background-color: #999; padding: 3px; vertical-align: top;">Latest Available Limit</td>
+                    </tr>
+                    {{#each data.bankingData.cc}}
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{bank}}</td>
+                        <td style="border: 1px solid #999; padding: 3px; vertical-align: top;">{{limit}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </td>
         </tr>
     </table>
     <h1>Account transactions as per SMS</h1>
     <table style="width: 100%; margin-top:2%;">
         {{#each data.bank_details}}
             <tr>
-                <td colspan="5" style="background-color: #999; padding: 7px;">
+                <td colspan="5" style="background-color: #999; padding: 3px;">
                     {{@key}}
                 </td>
             </tr>
             <tr>
-                <td style="border: 1px solid #999; padding: 7px;">
+                <td style="border: 1px solid #999; padding: 3px;">
                     Sr. No.
                 </td>
-                <td style="border: 1px solid #999; padding: 7px;">
+                <td style="border: 1px solid #999; padding: 3px;">
                     Date
                 </td>
-                <td style="border: 1px solid #999; padding: 7px;">
+                <td style="border: 1px solid #999; padding: 3px;">
                     Narration
                 </td>
-                <td style="border: 1px solid #999; padding: 7px;">
+                <td style="border: 1px solid #999; padding: 3px;">
                     Credit
                 </td>
-                <td style="border: 1px solid #999; padding: 7px;">
+                <td style="border: 1px solid #999; padding: 3px;">
                     Debit
                 </td>
             </tr>
             {{#each this}}
                 <tr>
-                    <td style="border: 1px solid #999; padding: 7px;">
+                    <td style="border: 1px solid #999; padding: 3px;">
                         {{inc @index}}
                     </td>
-                    <td style="border: 1px solid #999; padding: 7px;">
+                    <td style="border: 1px solid #999; padding: 3px;">
                         {{date}}
                     </td>
-                    <td style="border: 1px solid #999; padding: 7px;">
+                    <td style="border: 1px solid #999; padding: 3px;">
                         {{body}}
                     </td>
-                    <td style="border: 1px solid #999; padding: 7px;">
+                    <td style="border: 1px solid #999; padding: 3px;">
                         {{credit}}
                     </td>
-                    <td style="border: 1px solid #999; padding: 7px;">
+                    <td style="border: 1px solid #999; padding: 3px;">
                         {{debit}}
                     </td>
                 </tr>
