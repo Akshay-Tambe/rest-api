@@ -15,6 +15,7 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 const zohoController = require('./controllers/zohoController')
 const consumerSMSController = require('./controllers/customerSMSController');
+const smsRouter = require('./routes/smsRouter');
 
 
 
@@ -48,7 +49,8 @@ app.use('/generate-merge-image', mergeImageGenerator);
 app.use('/storeSMSCore', customerSMS);
 app.use('/clickAndWrap', clickAndWrap);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get('/updateDronaStatement', zohoController.updateDronaStatement);
+app.use('/sms', smsRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
