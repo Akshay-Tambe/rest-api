@@ -279,6 +279,7 @@ exports.fetchDronaData = async (req, res) => {
     var overdues = getOverdues(data.sms_profile.overdue);
     var credit_cards = getCC(data.sms_profile.cards);
     var utilities = getUtilities(data.sms_profile.utilities);
+    
     // console.log(credit_cards);
         var bank_details = await insertDronaTrans(deviceId);
         var bankingData = {
