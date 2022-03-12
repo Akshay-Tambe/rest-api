@@ -108,15 +108,15 @@
     <table style="width: 100%; margin-top: 2%">
         <tr>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>No. of bounces in last 6 months</b></td>
-            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{data.bankingData.bounces}}</td>
+            <td style="background-color: rgb(250, 151, 151); padding: 3px; vertical-align: top;">{{data.bankingData.bounces}}</td>
         </tr>
         <tr>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>Total EMI amount per month (In Rs.)</b></td>
-            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{data.bankingData.EMIs}}</td>
+            <td style="background-color: rgb(206, 252, 197); padding: 3px; vertical-align: top;">{{data.bankingData.EMIs}}</td>
         </tr>
         <tr>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>Salary per month (In Rs.)</b></td>
-            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{data.bankingData.salary}}</td>
+            <td style="background-color: rgb(206, 252, 197); padding: 3px; vertical-align: top;">{{data.bankingData.salary}}</td>
         </tr>
         <tr>
             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;"><b>Latest paid utility bills</b></td>
@@ -129,7 +129,7 @@
                     {{#each data.bankingData.utilities}}
                         <tr>
                             <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{utility}}</td>
-                            <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{amount}}</td>
+                            <td style="background-color: rgb(206, 252, 197); padding: 3px; vertical-align: top;">{{amount}}</td>
                         </tr>
                     {{/each}}
                 </table>
@@ -165,7 +165,7 @@
                                 {{#each this}}
                                     <tr>
                                         <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{utility}}</td>
-                                        <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{amount}}</td>
+                                        <td style="background-color: rgb(250, 151, 151); padding: 3px; vertical-align: top;">{{amount}}</td>
                                     </tr>
                                 {{/each}}
                             </table>
@@ -186,7 +186,7 @@
                     {{#each data.bankingData.cc}}
                     <tr>
                         <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{bank}}</td>
-                        <td style="border: 1px solid rgb(212, 212, 212); padding: 3px; vertical-align: top;">{{limit}}</td>
+                        <td style="background-color: rgb(206, 252, 197); padding: 3px; vertical-align: top;">{{limit}}</td>
                     </tr>
                     {{/each}}
                 </table>
